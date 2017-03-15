@@ -33,7 +33,7 @@ public class HelloWorldControllerTest {
     }
 
     @Test
-    public void testMain() throws Exception {
+    public void testHelloWorld() throws Exception {
         // Given
         // When
         ResultActions ra = mockMvc.perform(MockMvcRequestBuilders.get("/hello"));
