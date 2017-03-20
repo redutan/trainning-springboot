@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class HelloWorldControllerTest {
     @Autowired
     private WebApplicationContext wac;
-
     private MockMvc mockMvc;
 
     @Before
