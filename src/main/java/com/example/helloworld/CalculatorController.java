@@ -16,18 +16,6 @@ public class CalculatorController {
         return ResponseEntity.ok(sum(numbers));
     }
 
-    @RequestMapping("/calculator/adder2/{numbers}")
-    public int adder2(@PathVariable("numbers") List<Integer> numbers) {
-        checkParameter(numbers);
-        return sum(numbers);
-    }
-
-    private void checkParameter(List<Integer> numbers) {
-        if (hasDuplicated(numbers)) {
-            throw new IllegalArgumentException("오류 : 같은 수는 입력할 수 없습니다.");
-        }
-    }
-
     private boolean hasDuplicated(List<Integer> numbers) {
         long size = numbers.size();
         long distinctSize = numbers.stream().distinct().count();
@@ -42,6 +30,18 @@ public class CalculatorController {
         return result;
 //        return numbers.stream().reduce(0, Integer::sum);
 //        return numbers.stream().mapToInt(Integer::intValue).sum();
+    }
+
+    @RequestMapping("/calculator/adder2/{numbers}")
+    public int adder2(@PathVariable("numbers") List<Integer> numbers) {
+        checkParameter(numbers);
+        return sum(numbers);
+    }
+
+    private void checkParameter(List<Integer> numbers) {
+        if (hasDuplicated(numbers)) {
+            throw new IllegalArgumentException("오류 : 같은 수는 입력할 수 없습니다.");
+        }
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
