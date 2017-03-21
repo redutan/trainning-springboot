@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Slf4j
 public class BoardController {
 
-    @Qualifier("nonvliad.BoardRepository")
+    @Qualifier("nonvalid.boardRepository")
     @Autowired
     private BoardRepository boardRepository;
 
@@ -27,7 +27,7 @@ public class BoardController {
     @GetMapping("/boards/form")
     public String createForm(Model model) {
         model.addAttribute("board", Board.empty());
-        return "/nonvalid/boards/form";
+        return "nonvalid/boards/form";
     }
 
     /**

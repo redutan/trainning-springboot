@@ -1,62 +1,120 @@
 package com.example.board;
 
+import com.example.ControllerTestSupport;
 import org.apache.commons.beanutils.BeanUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.util.MultiValueMap;
 
-import javax.transaction.Transactional;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
 @Transactional
-public class BoardControllerTest {
-    @Autowired
-    private WebApplicationContext wac;
-
-    private MockMvc mockMvc;
-
+public class BoardControllerTest extends ControllerTestSupport {
     //param
-    private Board board1;
+    private Board board;
 
     @Before
     public void setUp() throws Exception {
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac)
-                .alwaysDo(print())
-                .build();
-        board1 = random(Board.class);
-        board1.setSeq(null);
-        board1.setRegDate(null);
+        super.setUp();
+    }
+
+    private void createBoard() {
+        board = random(Board.class);
+        board.setSeq(null);
+        board.setRegDate(null);
     }
 
     @Test
     public void testCreate() throws Exception {
         // Given
-        Map<String, String> objMap = BeanUtils.describe(board1);
-        LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.setAll(objMap);
+        createBoard();
+        MultiValueMap<String, String> params = toMultiValueMap();
         // When
         ResultActions ra = mockMvc.perform(post("/boards")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .params(params));
-        // Then
-        ra.andExpect(status().isFound());   // 302
-        ra.andExpect(view().name("redirect:/boards/form"));
+                .params(params))
+                // Then
+                .andExpect(status().isFound())   // 302
+                .andExpect(view().name("redirect:/boards/form"));
+    }
+
+    private MultiValueMap<String, String> toMultiValueMap() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        Map<String, String> objMap = BeanUtils.describe(board);
+        LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.setAll(objMap);
+        return params;
+    }
+
+    @Test
+    public void testCreate_TitleIsEmpty() throws Exception {
+        // Given
+        createBoard();
+        board.setTitle("");
+        MultiValueMap<String, String> params = toMultiValueMap();
+        // When
+        ResultActions ra = mockMvc.perform(post("/boards")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .params(params))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(view().name("boards/form"))
+                .andExpect(model().attributeHasFieldErrorCode("board", "title", is("NotEmpty")));
+    }
+
+    @Test
+    public void testCreate_TitleIsNull() throws Exception {
+        // Given
+        createBoard();
+        board.setTitle(null);
+        MultiValueMap<String, String> params = toMultiValueMap();
+        // When
+        ResultActions ra = mockMvc.perform(post("/boards")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .params(params))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(view().name("boards/form"))
+                .andExpect(model().attributeHasFieldErrorCode("board", "title", is("NotEmpty")));
+    }
+
+    @Test
+    public void testCreate_WriterIsEmpty() throws Exception {
+        // Given
+        createBoard();
+        board.setWriter("");
+        MultiValueMap<String, String> params = toMultiValueMap();
+        // When
+        ResultActions ra = mockMvc.perform(post("/boards")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .params(params))
+                // Then
+                .andExpect(status().isFound())   // 302
+                .andExpect(view().name("redirect:/boards/form"));
+    }
+
+    @Test
+    public void testCreate_WriterIsNull() throws Exception {
+        // Given
+        createBoard();
+        board.setWriter(null);
+        MultiValueMap<String, String> params = toMultiValueMap();
+        // When
+        ResultActions ra = mockMvc.perform(post("/boards")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .params(params))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(view().name("boards/form"))
+                .andExpect(model().attributeHasFieldErrorCode("board", "writer", is("NotNull")));
     }
 }

@@ -4,6 +4,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -23,6 +24,7 @@ public class Board {
      * 제목
      */
     @NotEmpty
+    @Column(nullable = false)
     private String title;
     /**
      * 내용
@@ -31,7 +33,8 @@ public class Board {
     /**
      * 작성자
      */
-    @NotEmpty
+    @NotNull
+    @Column(nullable = false)
     private String writer;
     /**
      * 등록일시
