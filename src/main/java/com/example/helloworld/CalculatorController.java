@@ -4,7 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class CalculatorController {
@@ -22,7 +24,7 @@ public class CalculatorController {
         return size != distinctSize;
     }
 
-    private int sum(List<Integer> numbers) {
+    private int sum(Collection<Integer> numbers) {
         int result = 0;
         for (Integer number : numbers) {
             result += number;
@@ -48,5 +50,10 @@ public class CalculatorController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Object handleIllegalArgumentException(IllegalArgumentException iae) {
         return iae.getMessage();
+    }
+
+    @RequestMapping("/calculator/adder3/{numbers}")
+    public int adder3(@PathVariable("numbers") Set<Integer> numbers) {
+        return sum(numbers);
     }
 }
