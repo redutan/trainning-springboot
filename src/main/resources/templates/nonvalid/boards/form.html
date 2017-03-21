@@ -14,7 +14,7 @@
             <label for="title">제목</label>
             <input th:field="*{title}" type="text" class="form-control" id="title" name="title" placeholder="제목"/>
         </div>
-        <div th:classappend="${#fields.hasErrors('title')} ? 'has-error' : ''" class="form-group has-feedback">
+        <div class="form-group has-feedback">
             <label for="writer">작성자</label>
             <input th:field="*{writer}" type="text" class="form-control" id="writer" name="writer" placeholder="작성자"/>
         </div>

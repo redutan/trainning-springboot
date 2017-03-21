@@ -1,14 +1,18 @@
 package com.example.board;
 
-import com.example.ControllerTestSupport;
 import org.apache.commons.beanutils.BeanUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.util.NestedServletException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
@@ -18,14 +22,18 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@Transactional
-public class BoardControllerTest extends ControllerTestSupport {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+public class BoardControllerTest {
+    @Autowired
+    private MockMvc mvc;
     //param
     private Board board;
 
     @Before
     public void setUp() throws Exception {
-        super.setUp();
+        createBoard();
     }
 
     private void createBoard() {
@@ -37,10 +45,9 @@ public class BoardControllerTest extends ControllerTestSupport {
     @Test
     public void testCreate() throws Exception {
         // Given
-        createBoard();
-        MultiValueMap<String, String> params = toMultiValueMap();
+        MultiValueMap<String, String> params = toMultiValueMap(board);
         // When
-        ResultActions ra = mockMvc.perform(post("/boards")
+        mvc.perform(post("/boards")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .params(params))
                 // Then
@@ -48,8 +55,8 @@ public class BoardControllerTest extends ControllerTestSupport {
                 .andExpect(view().name("redirect:/boards/form"));
     }
 
-    private MultiValueMap<String, String> toMultiValueMap() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        Map<String, String> objMap = BeanUtils.describe(board);
+    private MultiValueMap<String, String> toMultiValueMap(Object obj) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        Map<String, String> objMap = BeanUtils.describe(obj);
         LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.setAll(objMap);
         return params;
@@ -58,11 +65,10 @@ public class BoardControllerTest extends ControllerTestSupport {
     @Test
     public void testCreate_TitleIsEmpty() throws Exception {
         // Given
-        createBoard();
         board.setTitle("");
-        MultiValueMap<String, String> params = toMultiValueMap();
+        MultiValueMap<String, String> params = toMultiValueMap(board);
         // When
-        ResultActions ra = mockMvc.perform(post("/boards")
+        mvc.perform(post("/boards")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .params(params))
                 // Then
@@ -74,11 +80,10 @@ public class BoardControllerTest extends ControllerTestSupport {
     @Test
     public void testCreate_TitleIsNull() throws Exception {
         // Given
-        createBoard();
         board.setTitle(null);
-        MultiValueMap<String, String> params = toMultiValueMap();
+        MultiValueMap<String, String> params = toMultiValueMap(board);
         // When
-        ResultActions ra = mockMvc.perform(post("/boards")
+        mvc.perform(post("/boards")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .params(params))
                 // Then
@@ -90,11 +95,10 @@ public class BoardControllerTest extends ControllerTestSupport {
     @Test
     public void testCreate_WriterIsEmpty() throws Exception {
         // Given
-        createBoard();
         board.setWriter("");
-        MultiValueMap<String, String> params = toMultiValueMap();
+        MultiValueMap<String, String> params = toMultiValueMap(board);
         // When
-        ResultActions ra = mockMvc.perform(post("/boards")
+        mvc.perform(post("/boards")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .params(params))
                 // Then
@@ -105,16 +109,28 @@ public class BoardControllerTest extends ControllerTestSupport {
     @Test
     public void testCreate_WriterIsNull() throws Exception {
         // Given
-        createBoard();
         board.setWriter(null);
-        MultiValueMap<String, String> params = toMultiValueMap();
+        MultiValueMap<String, String> params = toMultiValueMap(board);
         // When
-        ResultActions ra = mockMvc.perform(post("/boards")
+        mvc.perform(post("/boards")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .params(params))
                 // Then
                 .andExpect(status().isOk())
                 .andExpect(view().name("boards/form"))
                 .andExpect(model().attributeHasFieldErrorCode("board", "writer", is("NotNull")));
+    }
+
+    @Test(expected = NestedServletException.class)
+    public void testCreate_ContentIsNull() throws Exception {
+        // Given
+        board.setContent(null);
+        MultiValueMap<String, String> params = toMultiValueMap(board);
+        // When
+        mvc.perform(post("/boards")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .params(params))
+                // Then
+                .andExpect(status().isInternalServerError());   // 500
     }
 }

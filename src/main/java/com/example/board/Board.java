@@ -29,6 +29,8 @@ public class Board {
     /**
      * 내용
      */
+    @Lob
+    @Column(nullable = false)
     private String content;
     /**
      * 작성자
