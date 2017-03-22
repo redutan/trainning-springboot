@@ -2,10 +2,11 @@ package com.example.board;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.util.Calendar;
 
 /**
  * 게시물 엔티티
@@ -14,6 +15,7 @@ import java.util.Date;
 @Data
 @Entity
 public class Board {
+    private static final Board EMPTY = new ImmutableBoard();
     /**
      * 순번
      */
@@ -41,15 +43,19 @@ public class Board {
     /**
      * 등록일시
      */
-    @Temporal(TemporalType.DATE)
-    @Column(name = "REG_DATE", insertable = false, updatable = false)
-    private Date regDate;
+    @DateTimeFormat(pattern = "yyyy.MM.dd HH:mm:ss")
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "REG_DATE", nullable = false, updatable = false)
+    private Calendar regDate;
 
     static Board empty() {
         return EMPTY;
     }
 
-    private static final Board EMPTY = new ImmutableBoard();
+    @PrePersist
+    void preInsert() {
+        this.regDate = Calendar.getInstance();
+    }
 
     private static class ImmutableBoard extends Board {
         @Override
@@ -73,7 +79,7 @@ public class Board {
         }
 
         @Override
-        public void setRegDate(Date regDate) {
+        public void setRegDate(Calendar regDate) {
             throw new UnsupportedOperationException("Immutable");
         }
     }
