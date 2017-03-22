@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
@@ -39,6 +38,7 @@ public class BoardControllerTest {
     }
 
     private void createBoard() {
+//        board = random(Board.class, "seq", "regDate");
         board = random(Board.class);
         board.setSeq(null);
         board.setRegDate(null);
@@ -46,7 +46,7 @@ public class BoardControllerTest {
 
     @Test
     public void testCreateForm() throws Exception {
-        mvc.perform(get("/boards/form")
+        mvc.perform(get("/nonvalid/boards/form")
                 .contentType(MediaType.TEXT_HTML))
                 // Then
                 .andExpect(status().isOk())   // 200
@@ -67,7 +67,7 @@ public class BoardControllerTest {
                 .andExpect(view().name("redirect:/nonvalid/boards/form"));
     }
 
-    private MultiValueMap<String, String> toMultiValueMap(Object obj) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    private MultiValueMap<String, String> toMultiValueMap(Object obj) throws Exception {
         Map<String, String> objMap = BeanUtils.describe(obj);
         LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.setAll(objMap);

@@ -26,7 +26,6 @@ public class BoardController {
      */
     @GetMapping("/boards/form")
     public String createForm(Model model) {
-        model.addAttribute("board", Board.empty());
         return "nonvalid/boards/form";
     }
 

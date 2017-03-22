@@ -14,7 +14,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.NestedServletException;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
@@ -69,7 +68,7 @@ public class BoardControllerTest {
                 .andExpect(view().name("redirect:/boards/form"));
     }
 
-    private MultiValueMap<String, String> toMultiValueMap(Object obj) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    private MultiValueMap<String, String> toMultiValueMap(Object obj) throws Exception {
         Map<String, String> objMap = BeanUtils.describe(obj);
         LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.setAll(objMap);

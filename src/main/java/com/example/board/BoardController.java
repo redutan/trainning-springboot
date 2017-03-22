@@ -25,7 +25,7 @@ public class BoardController {
      */
     @GetMapping("/boards/form")
     public String createForm(Model model) {
-        model.addAttribute("board", Board.empty());
+        model.addAttribute("board", new Board());
         return "boards/form";
     }
 
