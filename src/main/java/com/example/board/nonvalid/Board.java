@@ -4,7 +4,6 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * 게시물 엔티티
@@ -66,7 +65,7 @@ public class Board {
         }
 
         @Override
-        public void setRegDate(Date regDate) {
+        public void setRegDate(Calendar regDate) {
             throw new UnsupportedOperationException("Immutable");
         }
     }
