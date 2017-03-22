@@ -40,7 +40,8 @@
     <div>
         <a th:href="@{/boards}" class="btn btn-default" role="button">목록</a>
         <a th:href="@{/boards/{seq}/form(seq=*{seq})}" class="btn btn-primary" role="button">수정</a>
-        <buton id="btn-delete" class="btn btn-danger" role="button">삭제</buton>
+        <a th:href="@{/boards/{seq}/delete(seq=*{seq})}" class="btn btn-danger" role="button"
+           onclick="return confirm('삭제하시겠습니까?');">삭제</a>
     </div>
 </div>
 </body>

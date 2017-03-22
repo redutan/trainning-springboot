@@ -22,6 +22,7 @@ import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static io.github.benas.randombeans.api.EnhancedRandom.randomListOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -178,5 +179,22 @@ public class BoardControllerTest {
                 .andExpect(view().name("boards/list"))
                 .andExpect(model().attribute("boards", saveds))
                 .andExpect(model().hasNoErrors());
+    }
+
+    @Test
+    public void testDelete() throws Exception {
+        // Given
+        final int count = 2;
+        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
+        Iterable<Board> saveds = boardRepository.save(boards);
+        final Board first = saveds.iterator().next();
+        // When
+        mvc.perform(get("/boards/{seq}/delete", first.getSeq())
+                .contentType(MediaType.TEXT_HTML))
+                // Then
+                .andExpect(status().isFound())  // 302
+                .andExpect(view().name("redirect:/boards"));
+        assertThat(boardRepository.exists(first.getSeq()), is(false));  // 삭제되었는가?
+        assertThat(boardRepository.count(), is(count - 1L)); // 하나만 삭제되었는가?
     }
 }
