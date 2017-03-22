@@ -18,9 +18,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -41,6 +42,16 @@ public class BoardControllerTest {
         board = random(Board.class);
         board.setSeq(null);
         board.setRegDate(null);
+    }
+
+    @Test
+    public void testCreateForm() throws Exception {
+        mvc.perform(get("/boards/form")
+                .contentType(MediaType.TEXT_HTML))
+                // Then
+                .andExpect(status().isOk())   // 200
+                .andExpect(view().name("boards/form"))
+                .andExpect(content().string(containsString("게시물 등록")));
     }
 
     @Test

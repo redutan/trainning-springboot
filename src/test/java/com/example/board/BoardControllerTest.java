@@ -18,7 +18,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -28,6 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class BoardControllerTest {
     @Autowired
     private MockMvc mvc;
+    @Autowired
+    private BoardRepository boardRepository;
     //param
     private Board board;
 
@@ -40,6 +44,16 @@ public class BoardControllerTest {
         board = random(Board.class);
         board.setSeq(null);
         board.setRegDate(null);
+    }
+
+    @Test
+    public void testCreateForm() throws Exception {
+        mvc.perform(get("/boards/form")
+                .contentType(MediaType.TEXT_HTML))
+                // Then
+                .andExpect(status().isOk())   // 200
+                .andExpect(view().name("boards/form"))
+                .andExpect(content().string(containsString("게시물 등록")));
     }
 
     @Test
@@ -132,5 +146,18 @@ public class BoardControllerTest {
                 .params(params))
                 // Then
                 .andExpect(status().isInternalServerError());   // 500
+    }
+
+    @Test
+    public void testView() throws Exception {
+        // Given
+        final Board saved = boardRepository.save(board);
+        // When
+        mvc.perform(get("/boards/{seq}", saved.getSeq())
+                .contentType(MediaType.TEXT_HTML))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(view().name("boards/view"))
+                .andExpect(model().attribute("board", is(saved)));
     }
 }
