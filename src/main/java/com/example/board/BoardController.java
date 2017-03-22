@@ -40,8 +40,7 @@ public class BoardController {
         }
         Board save = boardRepository.save(board);
         log.info("save = {}", save);
-        // FIXME Redirect /boards
-        return "redirect:/boards/form";
+        return "redirect:/boards";
     }
 
     /**

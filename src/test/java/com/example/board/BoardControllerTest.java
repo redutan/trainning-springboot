@@ -1,5 +1,6 @@
 package com.example.board;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@Slf4j
 public class BoardControllerTest {
     @Autowired
     private MockMvc mvc;
@@ -67,7 +69,7 @@ public class BoardControllerTest {
                 .params(params))
                 // Then
                 .andExpect(status().isFound())   // 302
-                .andExpect(view().name("redirect:/boards/form"));
+                .andExpect(view().name("redirect:/boards"));
     }
 
     private MultiValueMap<String, String> toMultiValueMap(Object obj) throws Exception {
@@ -118,7 +120,7 @@ public class BoardControllerTest {
                 .params(params))
                 // Then
                 .andExpect(status().isFound())   // 302
-                .andExpect(view().name("redirect:/boards/form"));
+                .andExpect(view().name("redirect:/boards"));
     }
 
     @Test
@@ -174,7 +176,7 @@ public class BoardControllerTest {
                 // Then
                 .andExpect(status().isOk())
                 .andExpect(view().name("boards/list"))
-                .andExpect(model().attributeExists("boards"))
+                .andExpect(model().attribute("boards", saveds))
                 .andExpect(model().hasNoErrors());
     }
 }

@@ -20,11 +20,11 @@
             </tr>
             </thead>
             <tbody>
-            <tr>
-                <th>1</th>
-                <th>적절한 제목입니다.</th>
-                <th>홍길동</th>
-                <th>2017.01.01 00:00:00</th>
+            <tr th:each="board : ${boards}">
+                <td class="text-right" th:text="${{board.seq}}">1</td>
+                <td class="text-left"><a href="/boards/1" th:text="${board.title}">적절한 제목입니다.</a></td>
+                <td th:text="${board.writer}">홍길동</td>
+                <td th:text="${{board.regDate}}">2017.01.01 00:00:00</td>
             </tr>
             </tbody>
         </table>

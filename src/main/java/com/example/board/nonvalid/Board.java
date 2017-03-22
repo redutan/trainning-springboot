@@ -10,7 +10,7 @@ import java.util.Date;
  */
 @SuppressWarnings("WeakerAccess")
 @Data
-@Entity
+@Entity(name = "nonvalid.board")
 public class Board {
     /**
      * 순번
