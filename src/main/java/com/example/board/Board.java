@@ -5,7 +5,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.util.Calendar;
 
 /**
  * 게시물 엔티티
@@ -41,9 +41,9 @@ public class Board {
     /**
      * 등록일시
      */
-    @Temporal(TemporalType.DATE)
-    @Column(name = "REG_DATE", insertable = false, updatable = false)
-    private Date regDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "REG_DATE", nullable = false, updatable = false)
+    private Calendar regDate;
 
     static Board empty() {
         return EMPTY;
@@ -73,7 +73,7 @@ public class Board {
         }
 
         @Override
-        public void setRegDate(Date regDate) {
+        public void setRegDate(Calendar regDate) {
             throw new UnsupportedOperationException("Immutable");
         }
     }
