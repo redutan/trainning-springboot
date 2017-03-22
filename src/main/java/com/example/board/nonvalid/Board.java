@@ -3,6 +3,7 @@ package com.example.board.nonvalid;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -33,9 +34,9 @@ public class Board {
     /**
      * 등록일시
      */
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "REG_DATE", insertable = false, updatable = false)
-    private Date regDate;
+    private Calendar regDate;
 
     static Board empty() {
         return EMPTY;
