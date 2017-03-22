@@ -9,7 +9,7 @@
 <body>
 <div class="container">
     <h1>게시물 등록</h1>
-    <form action="/boards" th:action="@{/boards}" th:object="${board}" method="post">
+    <form th:action="@{/boards}" th:object="${board}" method="post">
         <div th:classappend="${#fields.hasErrors('title')} ? 'has-error' : ''" class="form-group has-feedback">
             <label for="title">제목</label>
             <input th:field="*{title}" type="text" class="form-control" id="title" name="title" placeholder="제목"/>

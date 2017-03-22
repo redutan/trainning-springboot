@@ -1,19 +1,21 @@
 package com.example.helloworld;
 
-import com.example.ControllerTestSupport;
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.test.web.servlet.ResultActions;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class LetterControllerTest extends ControllerTestSupport {
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
+@RunWith(SpringRunner.class)
+@WebMvcTest(LetterController.class)
+public class LetterControllerTest {
+    @Autowired
+    private MockMvc mvc;
 
     @Test
     public void testTo() throws Exception {
@@ -21,10 +23,10 @@ public class LetterControllerTest extends ControllerTestSupport {
         final String who = "MJ";
         final String message = "iloveyou";
         // When
-        ResultActions ra = mockMvc.perform(get("/to/{who}", who)
-                .param("message", message));
-        // Then
-        ra.andExpect(status().isOk());
-        ra.andExpect(content().string("To MJ iloveyou"));
+        mvc.perform(get("/to/{who}", who)
+                .param("message", message))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(content().string("To MJ iloveyou"));
     }
 }

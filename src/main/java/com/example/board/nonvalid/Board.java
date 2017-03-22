@@ -1,10 +1,8 @@
-package com.example.board;
+package com.example.board.nonvalid;
 
 import lombok.Data;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -23,20 +21,14 @@ public class Board {
     /**
      * 제목
      */
-    @NotEmpty
-    @Column(nullable = false)
     private String title;
     /**
      * 내용
      */
-    @Lob
-    @Column(nullable = false)
     private String content;
     /**
      * 작성자
      */
-    @NotNull
-    @Column(nullable = false)
     private String writer;
     /**
      * 등록일시
