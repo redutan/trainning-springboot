@@ -26,8 +26,9 @@ public class RestBoardController {
         Board save = boardRepository.save(board);
         log.info("save = {}", save);
         // Location : Created resource
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{seq}")
-                .buildAndExpand(save.getSeq()).toUri();
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{seq}").buildAndExpand(save.getSeq())
+                .toUri();
         return ResponseEntity.created(location).build();
     }
 }
