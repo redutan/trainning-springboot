@@ -7,19 +7,19 @@
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css}"/>
 </head>
 <body>
-<div class="container">
+<div class="container" th:object="${board}">
     <h1>게시물 조회</h1>
-    <form class="form-horizontal" th:object="${board}">
+    <form class="form-horizontal">
         <div class="form-group">
             <label class="control-label col-sm-2">제목</label>
             <div class="col-sm-10">
-                <p class="form-control-static" th:text="*{title}">뻘글작성</p>
+                <p class="form-control-static" th:text="*{title}">게시물의 제목압니다</p>
             </div>
         </div>
         <div class="form-group">
             <label class="control-label col-sm-2">작성자</label>
             <div class="col-sm-10">
-                <p class="form-control-static" th:text="*{writer}">정명주</p>
+                <p class="form-control-static" th:text="*{writer}">홍길동</p>
             </div>
         </div>
         <div class="form-group">
@@ -32,13 +32,15 @@
             <label class="control-label col-sm-2">내용</label>
             <div class="col-sm-10">
             <textarea class="form-control" id="content" name="content"
-                      placeholder="내용" th:text="*{content}" readonly="readonly"></textarea>
+                      placeholder="내용" th:text="*{content}" readonly="readonly">게시물의 내용입니다.
+            게시물의 내용입니다.</textarea>
             </div>
         </div>
     </form>
     <div>
         <a th:href="@{/boards}" class="btn btn-default" role="button">목록</a>
-        <a th:href="@{/boards/*{seq}/form}" class="btn btn-primary" role="button">수정</a>
+        <a th:href="@{/boards/{seq}/form(seq=*{seq})}" class="btn btn-primary" role="button">수정</a>
+        <buton id="btn-delete" class="btn btn-danger" role="button">삭제</buton>
     </div>
 </div>
 </body>

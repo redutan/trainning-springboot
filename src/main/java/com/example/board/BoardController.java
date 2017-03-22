@@ -48,8 +48,7 @@ public class BoardController {
      * 게시물 1건 조회
      */
     @GetMapping("/boards/{seq}")
-    public String view(@PathVariable Long seq, Model model) {
-        Board board = boardRepository.findOne(seq);
+    public String view(@PathVariable("seq") Board board, Model model) {
         model.addAttribute("board", board);
         return "boards/view";
     }
