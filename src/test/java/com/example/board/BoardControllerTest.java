@@ -14,9 +14,11 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.NestedServletException;
 
+import java.util.List;
 import java.util.Map;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
+import static io.github.benas.randombeans.api.EnhancedRandom.randomListOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -158,5 +160,21 @@ public class BoardControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("boards/view"))
                 .andExpect(model().attribute("board", is(saved)));
+    }
+
+    @Test
+    public void testList() throws Exception {
+        // Given
+        final int count = 10;
+        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
+        Iterable<Board> saveds = boardRepository.save(boards);
+        // When
+        mvc.perform(get("/boards")
+                .contentType(MediaType.TEXT_HTML))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(view().name("boards/list"))
+                .andExpect(model().attributeExists("boards"))
+                .andExpect(model().hasNoErrors());
     }
 }

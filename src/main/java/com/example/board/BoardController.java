@@ -52,4 +52,11 @@ public class BoardController {
         model.addAttribute("board", board);
         return "boards/view";
     }
+
+    @GetMapping("/boards")
+    public String list(Model model) {
+        Iterable<Board> boards = boardRepository.findAll();
+        model.addAttribute("boards", boards);
+        return "boards/list";
+    }
 }
