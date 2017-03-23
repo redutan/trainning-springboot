@@ -71,4 +71,13 @@ public class BoardController {
         boardRepository.delete(seq);
         return "redirect:/boards";
     }
+
+    /**
+     * 게시물 수정 폼
+     */
+    @GetMapping("/boards/{seq}/form")
+    public String updateForm(@PathVariable("seq") Board board, Model model) {
+        model.addAttribute("board", board);
+        return "boards/form";
+    }
 }

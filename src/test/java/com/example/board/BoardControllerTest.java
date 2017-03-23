@@ -59,7 +59,7 @@ public class BoardControllerTest {
                 // Then
                 .andExpect(status().isOk())   // 200
                 .andExpect(view().name("boards/form"))
-                .andExpect(content().string(containsString("게시물 등록")));
+                .andExpect(content().string(containsString("게시물 저장")));
     }
 
     @Test
@@ -198,5 +198,18 @@ public class BoardControllerTest {
                 .andExpect(view().name("redirect:/boards"));
         assertThat(boardRepository.exists(first.getSeq()), is(false));  // 삭제되었는가?
         assertThat(boardRepository.count(), is(count - 1L)); // 하나만 삭제되었는가?
+    }
+
+    @Test
+    public void testUpdateForm() throws Exception {
+        // Given
+        final Board saved = boardRepository.save(board);
+        // When
+        mvc.perform(get("/boards/{seq}/form", saved.getSeq())
+                .contentType(MediaType.TEXT_HTML))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(view().name("boards/form"))
+                .andExpect(model().attribute("board", is(saved)));
     }
 }

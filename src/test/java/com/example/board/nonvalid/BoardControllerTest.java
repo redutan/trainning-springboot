@@ -51,7 +51,7 @@ public class BoardControllerTest {
                 // Then
                 .andExpect(status().isOk())   // 200
                 .andExpect(view().name("boards/form"))
-                .andExpect(content().string(containsString("게시물 등록")));
+                .andExpect(content().string(containsString("게시물 저장")));
     }
 
     @Test

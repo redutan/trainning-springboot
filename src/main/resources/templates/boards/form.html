@@ -2,17 +2,18 @@
 <!--suppress ALL -->
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <title>게시물 등록</title>
+    <title>게시물 저장</title>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css}"/>
 </head>
 <body>
 <div class="container">
-    <h1>게시물 등록</h1>
+    <h1>게시물 저장</h1>
     <form th:action="@{/boards}" th:object="${board}" method="post">
+        <input type="hidden" id="seq" th:field="*{seq}"/>
         <div th:classappend="${#fields.hasErrors('title')} ? 'has-error' : ''" class="form-group has-feedback">
             <label for="title">제목</label>
-            <input th:field="*{title}" type="text" class="form-control" id="title" name="title" placeholder="제목"/>
+            <input th:field="*{title}" type="text" class="form-control" placeholder="제목"/>
             <label th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="control-label" for="title"></label>
             <span th:if="${#fields.hasErrors('title')}" class="glyphicon glyphicon-remove form-control-feedback"
                   aria-hidden="true"></span>
@@ -20,7 +21,7 @@
         </div>
         <div th:classappend="${#fields.hasErrors('writer')} ? 'has-error' : ''" class="form-group has-feedback">
             <label for="writer">작성자</label>
-            <input th:field="*{writer}" type="text" class="form-control" id="writer" name="writer" placeholder="작성자"/>
+            <input th:field="*{writer}" type="text" class="form-control" placeholder="작성자"/>
             <label th:if="${#fields.hasErrors('writer')}" th:errors="*{writer}" class="control-label"
                    for="title"></label>
             <span th:if="${#fields.hasErrors('writer')}" class="glyphicon glyphicon-remove form-control-feedback"
