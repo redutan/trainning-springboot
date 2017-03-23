@@ -212,4 +212,23 @@ public class BoardControllerTest {
                 .andExpect(view().name("boards/form"))
                 .andExpect(model().attribute("board", is(saved)));
     }
+
+    @Test
+    public void testUpdate() throws Exception {
+        // Given
+        final Board saved = boardRepository.save(board);
+        final Board willUpdate = random(Board.class);
+        willUpdate.setSeq(saved.getSeq());
+        willUpdate.setRegDate(null);
+        MultiValueMap<String, String> params = toMultiValueMap(willUpdate);
+        // When
+        mvc.perform(post("/boards")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .params(params))
+                // Then
+                .andExpect(status().isFound())   // 302
+                .andExpect(view().name("redirect:/boards"));
+        Board updated = boardRepository.findOne(saved.getSeq());
+        assertThat(updated, is(willUpdate));
+    }
 }
