@@ -16,6 +16,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.NestedServletException;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -230,5 +231,26 @@ public class BoardControllerTest {
                 .andExpect(view().name("redirect:/boards"));
         Board updated = boardRepository.findOne(saved.getSeq());
         assertThat(updated, is(willUpdate));
+    }
+
+    @Test
+    public void testSearch_Title() throws Exception {
+        // Given
+        final int count = 10;
+        final String searchValue = "searchSEARCH";  // 검색어
+        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
+        Board board1 = boards.get(0);
+        board1.setTitle(board1.getTitle() + searchValue + board1.getTitle());
+        Iterable<Board> saveds = boardRepository.save(boards);
+        // When
+        mvc.perform(get("/boards")
+                .contentType(MediaType.TEXT_HTML)
+                .param("title", searchValue))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(view().name("boards/list"))
+                .andExpect(model().attribute("boards", Collections.singletonList(board1)))
+                .andExpect(model().attribute("title", searchValue))
+                .andExpect(model().hasNoErrors());
     }
 }

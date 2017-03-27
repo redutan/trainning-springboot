@@ -9,6 +9,17 @@
 <body>
 <div class="container">
     <h1>게시물 목록</h1>
+    <form class="form-horizontal" th:action="@{/boards}" method="get">
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="title">제목</label>
+            <div class="col-sm-6">
+                <input id="title" name="title" type="text" class="form-control" placeholder="제목" th:text="${title}"/>
+            </div>
+        </div>
+        <div class="container">
+            <button type="submit" class="btn btn-default">검색</button>
+        </div>
+    </form>
     <div class="table-responsive">
         <table class="table">
             <thead>

@@ -5,10 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -57,8 +54,14 @@ public class BoardController {
      * 게시물 목록 조회
      */
     @GetMapping("/boards")
-    public String list(Model model) {
-        Iterable<Board> boards = boardRepository.findAll();
+    public String list(@RequestParam(required = false) String title, Model model) {
+        Iterable<Board> boards;
+        if (title != null) {    // 제목 검색
+            boards = boardRepository.findByTitleContaining(title);
+            model.addAttribute("title", title);
+        } else {
+            boards = boardRepository.findAll();
+        }
         model.addAttribute("boards", boards);
         return "boards/list";
     }
