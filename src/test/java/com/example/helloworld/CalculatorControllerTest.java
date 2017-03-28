@@ -1,11 +1,11 @@
 package com.example.helloworld;
 
-import com.example.ControllerTestSupport;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Arrays;
@@ -17,12 +17,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
-public class CalculatorControllerTest extends ControllerTestSupport {
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
+@WebMvcTest(CalculatorController.class)
+public class CalculatorControllerTest {
+    @Autowired
+    private MockMvc mvc;
 
     @Test
     public void testAdder_1234() throws Exception {
@@ -30,7 +28,7 @@ public class CalculatorControllerTest extends ControllerTestSupport {
         final List<Integer> numbers = Arrays.asList(1, 2, 3, 4);
         final String numbersString = numbers.stream().map(String::valueOf).collect(joining(","));
         // When
-        ResultActions ra = mockMvc.perform(get("/calculator/adder/{numbers}", numbersString));
+        ResultActions ra = mvc.perform(get("/calculator/adder/{numbers}", numbersString));
         // Then
         ra.andExpect(status().isOk());
         ra.andExpect(content().string(String.valueOf(10)));
@@ -42,7 +40,7 @@ public class CalculatorControllerTest extends ControllerTestSupport {
         final List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
         final String numbersString = numbers.stream().map(String::valueOf).collect(joining(","));
         // When
-        ResultActions ra = mockMvc.perform(get("/calculator/adder/{numbers}", numbersString));
+        ResultActions ra = mvc.perform(get("/calculator/adder/{numbers}", numbersString));
         // Then
         ra.andExpect(status().isOk());
         ra.andExpect(content().string(String.valueOf(15)));
@@ -54,7 +52,7 @@ public class CalculatorControllerTest extends ControllerTestSupport {
         final List<Integer> numbers = Arrays.asList(1, 1, 1);
         final String numbersString = numbers.stream().map(String::valueOf).collect(joining(","));
         // When
-        ResultActions ra = mockMvc.perform(get("/calculator/adder/{numbers}", numbersString));
+        ResultActions ra = mvc.perform(get("/calculator/adder/{numbers}", numbersString));
         // Then
         ra.andExpect(content().string("오류 : 같은 수는 입력할 수 없습니다."));
         ra.andExpect(status().isBadRequest());
@@ -66,7 +64,7 @@ public class CalculatorControllerTest extends ControllerTestSupport {
         final List<Integer> numbers = Arrays.asList(1, 2, 1);
         final String numbersString = numbers.stream().map(String::valueOf).collect(joining(","));
         // When
-        ResultActions ra = mockMvc.perform(get("/calculator/adder/{numbers}", numbersString));
+        ResultActions ra = mvc.perform(get("/calculator/adder/{numbers}", numbersString));
         // Then
         ra.andExpect(content().string("오류 : 같은 수는 입력할 수 없습니다."));
         ra.andExpect(status().isBadRequest());
@@ -76,7 +74,7 @@ public class CalculatorControllerTest extends ControllerTestSupport {
     public void testAdder_None() throws Exception {
         // Given
         // When
-        ResultActions ra = mockMvc.perform(get("/calculator/adder/"));
+        ResultActions ra = mvc.perform(get("/calculator/adder/"));
         // Then
         ra.andExpect(status().isNotFound());
     }
@@ -87,7 +85,7 @@ public class CalculatorControllerTest extends ControllerTestSupport {
         final List<Integer> numbers = Arrays.asList(1, 2, 3, 4);
         final String numbersString = numbers.stream().map(String::valueOf).collect(joining(","));
         // When
-        ResultActions ra = mockMvc.perform(get("/calculator/adder2/{numbers}", numbersString));
+        ResultActions ra = mvc.perform(get("/calculator/adder2/{numbers}", numbersString));
         // Then
         ra.andExpect(status().isOk());
         ra.andExpect(content().string(String.valueOf(10)));
@@ -99,7 +97,7 @@ public class CalculatorControllerTest extends ControllerTestSupport {
         final List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
         final String numbersString = numbers.stream().map(String::valueOf).collect(joining(","));
         // When
-        ResultActions ra = mockMvc.perform(get("/calculator/adder2/{numbers}", numbersString));
+        ResultActions ra = mvc.perform(get("/calculator/adder2/{numbers}", numbersString));
         // Then
         ra.andExpect(status().isOk());
         ra.andExpect(content().string(String.valueOf(15)));
@@ -111,7 +109,7 @@ public class CalculatorControllerTest extends ControllerTestSupport {
         final List<Integer> numbers = Arrays.asList(1, 1, 1);
         final String numbersString = numbers.stream().map(String::valueOf).collect(joining(","));
         // When
-        ResultActions ra = mockMvc.perform(get("/calculator/adder2/{numbers}", numbersString));
+        ResultActions ra = mvc.perform(get("/calculator/adder2/{numbers}", numbersString));
         // Then
         ra.andExpect(content().string("오류 : 같은 수는 입력할 수 없습니다."));
         ra.andExpect(status().isBadRequest());
@@ -123,7 +121,7 @@ public class CalculatorControllerTest extends ControllerTestSupport {
         final List<Integer> numbers = Arrays.asList(1, 2, 1);
         final String numbersString = numbers.stream().map(String::valueOf).collect(joining(","));
         // When
-        ResultActions ra = mockMvc.perform(get("/calculator/adder2/{numbers}", numbersString));
+        ResultActions ra = mvc.perform(get("/calculator/adder2/{numbers}", numbersString));
         // Then
         ra.andExpect(content().string("오류 : 같은 수는 입력할 수 없습니다."));
         ra.andExpect(status().isBadRequest());
@@ -133,7 +131,7 @@ public class CalculatorControllerTest extends ControllerTestSupport {
     public void testAdder2_None() throws Exception {
         // Given
         // When
-        ResultActions ra = mockMvc.perform(get("/calculator/adder2/"));
+        ResultActions ra = mvc.perform(get("/calculator/adder2/"));
         // Then
         ra.andExpect(status().isNotFound());
     }
@@ -144,7 +142,7 @@ public class CalculatorControllerTest extends ControllerTestSupport {
         final List<Integer> numbers = Arrays.asList(1, 2, 1);
         final String numbersString = numbers.stream().map(String::valueOf).collect(joining(","));
         // When
-        ResultActions ra = mockMvc.perform(get("/calculator/adder3/{numbers}", numbersString));
+        ResultActions ra = mvc.perform(get("/calculator/adder3/{numbers}", numbersString));
         // Then
         ra.andExpect(status().isOk());  // !!!
         ra.andExpect(content().string(String.valueOf(3)));
@@ -160,7 +158,7 @@ public class CalculatorControllerTest extends ControllerTestSupport {
         // Given
         final String numbersString = numbers.stream().map(String::valueOf).collect(joining(","));
         // When
-        mockMvc.perform(get("/calculator/accumulator/{numbers}", numbersString))
+        mvc.perform(get("/calculator/accumulator/{numbers}", numbersString))
                 // Then
                 .andExpect(status().isOk()) // 200
                 .andExpect(content().string(String.valueOf(actual)));
