@@ -31,10 +31,10 @@ public class Calculator2ControllerTest {
         final List<Integer> numbers = Arrays.asList(1, 2, 3, 4);
         final String numbersString = numbers.stream().map(String::valueOf).collect(joining(","));
         // When
-        ResultActions ra = mvc.perform(get("/calculator2/adder/{numbers}", numbersString));
-        // Then
-        ra.andExpect(status().isOk());
-        ra.andExpect(content().string(String.valueOf(10)));
+        mvc.perform(get("/calculator2/adder/{numbers}", numbersString))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(content().string(String.valueOf(10)));
     }
 
     @Test
@@ -43,10 +43,10 @@ public class Calculator2ControllerTest {
         final List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
         final String numbersString = numbers.stream().map(String::valueOf).collect(joining(","));
         // When
-        ResultActions ra = mvc.perform(get("/calculator2/adder/{numbers}", numbersString));
-        // Then
-        ra.andExpect(status().isOk());
-        ra.andExpect(content().string(String.valueOf(15)));
+        mvc.perform(get("/calculator2/adder/{numbers}", numbersString))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(content().string(String.valueOf(15)));
     }
 
     @Test
@@ -54,10 +54,10 @@ public class Calculator2ControllerTest {
         // Given
         final Integer number = 1;
         // When
-        ResultActions ra = mvc.perform(get("/calculator2/adder/{numbers}", number));
-        // Then
-        ra.andExpect(content().string("오류 : 숫자는 최소 2개 이상 입력해야합니다."));
-        ra.andExpect(status().isBadRequest());
+        ResultActions ra = mvc.perform(get("/calculator2/adder/{numbers}", number))
+                // Then
+                .andExpect(content().string("오류 : 숫자는 최소 2개 이상 입력해야합니다."))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -66,10 +66,10 @@ public class Calculator2ControllerTest {
         final List<Integer> numbers = Arrays.asList(1, 1, 1);
         final String numbersString = numbers.stream().map(String::valueOf).collect(joining(","));
         // When
-        ResultActions ra = mvc.perform(get("/calculator2/adder/{numbers}", numbersString));
-        // Then
-        ra.andExpect(content().string("오류 : 중복되는 수가 존재합니다."));
-        ra.andExpect(status().isBadRequest());
+        mvc.perform(get("/calculator2/adder/{numbers}", numbersString))
+                // Then
+                .andExpect(content().string("오류 : 중복되는 수가 존재합니다."))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -78,19 +78,19 @@ public class Calculator2ControllerTest {
         final List<Integer> numbers = Arrays.asList(1, 2, 1);
         final String numbersString = numbers.stream().map(String::valueOf).collect(joining(","));
         // When
-        ResultActions ra = mvc.perform(get("/calculator2/adder/{numbers}", numbersString));
-        // Then
-        ra.andExpect(content().string("오류 : 중복되는 수가 존재합니다."));
-        ra.andExpect(status().isBadRequest());
+        mvc.perform(get("/calculator2/adder/{numbers}", numbersString))
+                // Then
+                .andExpect(content().string("오류 : 중복되는 수가 존재합니다."))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     public void testAdder_None() throws Exception {
         // Given
         // When
-        ResultActions ra = mvc.perform(get("/calculator2/adder/"));
-        // Then
-        ra.andExpect(status().isNotFound());
+        ResultActions ra = mvc.perform(get("/calculator2/adder/"))
+                // Then
+                .andExpect(status().isNotFound());
     }
 
     @Test
