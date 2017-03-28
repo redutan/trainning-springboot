@@ -1,4 +1,4 @@
-package com.example.helloworld;
+package com.example.helloworld.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
