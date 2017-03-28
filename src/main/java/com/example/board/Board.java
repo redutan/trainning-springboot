@@ -45,6 +45,11 @@ public class Board {
     @Column(name = "REG_DATE", nullable = false, updatable = false)
     private Calendar regDate;
 
+    @PrePersist /* 새로운 것이 추가되었다. !!! */
+    void preInsert() {
+        this.regDate = Calendar.getInstance();
+    }
+
     static Board empty() {
         return EMPTY;
     }
