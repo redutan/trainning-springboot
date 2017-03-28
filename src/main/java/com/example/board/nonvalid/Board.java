@@ -37,6 +37,11 @@ public class Board {
     @Column(name = "REG_DATE", nullable = false, updatable = false)
     private Calendar regDate;
 
+    @PrePersist
+    void preInsert() {
+        this.regDate = Calendar.getInstance();
+    }
+
     static Board empty() {
         return EMPTY;
     }
