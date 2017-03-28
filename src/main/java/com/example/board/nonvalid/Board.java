@@ -34,7 +34,7 @@ public class Board {
      * 등록일시
      */
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "REG_DATE", insertable = false, updatable = false)
+    @Column(name = "REG_DATE", nullable = false, updatable = false)
     private Calendar regDate;
 
     static Board empty() {
