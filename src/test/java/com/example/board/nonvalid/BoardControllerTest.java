@@ -50,8 +50,8 @@ public class BoardControllerTest {
                 .contentType(MediaType.TEXT_HTML))
                 // Then
                 .andExpect(status().isOk())   // 200
-                .andExpect(view().name("boards/form"))
-                .andExpect(content().string(containsString("게시물 저장")));
+                .andExpect(view().name("nonvalid/boards/form"))
+                .andExpect(content().string(containsString("게시물 등록")));
     }
 
     @Test
