@@ -7,9 +7,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 public class CalculatorController {
+    private final AtomicInteger sum = new AtomicInteger();
+
     @RequestMapping("/calculator/adder/{numbers}")
     public ResponseEntity<Object> adder(@PathVariable("numbers") List<Integer> numbers) {
         if (hasDuplicated(numbers)) {
@@ -55,5 +58,10 @@ public class CalculatorController {
     @RequestMapping("/calculator/adder3/{numbers}")
     public int adder3(@PathVariable("numbers") Set<Integer> numbers) {
         return sum(numbers);
+    }
+
+    @RequestMapping("/calculator/accumulator/{numbers}")
+    public int accumulator(@PathVariable("numbers") List<Integer> numbers) {
+        return sum.accumulateAndGet(sum(numbers), Integer::sum);
     }
 }

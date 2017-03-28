@@ -146,4 +146,20 @@ public class CalculatorControllerTest {
                 .andExpect(status().isOk())  // !!!
                 .andExpect(content().string(String.valueOf(3)));
     }
+
+    @Test
+    public void testAccumulator() throws Exception {
+        testAccumulator(Arrays.asList(1, 2, 3, 4), 10);
+        testAccumulator(Arrays.asList(1, 2, 3, 4, 5), 25);
+    }
+
+    private void testAccumulator(List<Integer> numbers, int actual) throws Exception {
+        // Given
+        final String numbersString = numbers.stream().map(String::valueOf).collect(joining(","));
+        // When
+        mvc.perform(get("/calculator/accumulator/{numbers}", numbersString))
+                // Then
+                .andExpect(status().isOk()) // 200
+                .andExpect(content().string(String.valueOf(actual)));
+    }
 }
