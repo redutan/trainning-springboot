@@ -58,10 +58,10 @@ public class BoardController {
                        @RequestParam(required = false) String writer,
                        Model model) {
         Iterable<Board> boards;
-        if (title != null) {    // 제목 또는 내용 검색
+        if (title != null) {    // 제목 검색
             boards = boardRepository.findByTitleContaining(title);
             model.addAttribute("title", title);
-        } else if (writer != null) {
+        } else if (writer != null) {    // 작성자 검색
             boards = boardRepository.findByWriter(writer);
             model.addAttribute("writer", writer);
         } else {
