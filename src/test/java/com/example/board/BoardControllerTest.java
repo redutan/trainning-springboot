@@ -16,7 +16,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.NestedServletException;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -234,12 +234,12 @@ public class BoardControllerTest {
     }
 
     @Test
-    public void testSearch_Title() throws Exception {
+    public void testSearch_TitleOrContent() throws Exception {
         // Given
         final int count = 10;
         final String searchValue = "searchSEARCH";  // 검색어
         final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
-        Board board1 = boards.get(0);
+        Board board1 = boards.get(0);   // 제목 검색됨
         board1.setTitle(board1.getTitle() + searchValue + board1.getTitle());
         Iterable<Board> saveds = boardRepository.save(boards);
         // When
@@ -249,7 +249,7 @@ public class BoardControllerTest {
                 // Then
                 .andExpect(status().isOk())
                 .andExpect(view().name("boards/list"))
-                .andExpect(model().attribute("boards", Collections.singletonList(board1)))
+                .andExpect(model().attribute("boards", Arrays.asList(board1)))
                 .andExpect(model().attribute("title", searchValue))
                 .andExpect(model().hasNoErrors());
     }
