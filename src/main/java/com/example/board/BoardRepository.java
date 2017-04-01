@@ -12,4 +12,6 @@ import java.util.List;
 @Repository
 public interface BoardRepository extends CrudRepository<Board, Long> {
     List<Board> findByTitleContaining(String title);
+
+    List<Board> findByWriter(String writer);
 }

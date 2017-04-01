@@ -54,11 +54,16 @@ public class BoardController {
      * 게시물 목록 조회
      */
     @GetMapping("/boards")
-    public String list(@RequestParam(required = false) String title, Model model) {
+    public String list(@RequestParam(required = false) String title,
+                       @RequestParam(required = false) String writer,
+                       Model model) {
         Iterable<Board> boards;
         if (title != null) {    // 제목 또는 내용 검색
             boards = boardRepository.findByTitleContaining(title);
             model.addAttribute("title", title);
+        } else if (writer != null) {
+            boards = boardRepository.findByWriter(writer);
+            model.addAttribute("writer", writer);
         } else {
             boards = boardRepository.findAll();
         }

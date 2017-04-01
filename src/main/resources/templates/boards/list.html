@@ -18,6 +18,13 @@
                            placeholder="제목" th:text="${title}"/>
                 </div>
             </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="writer">작성자</label>
+                <div class="col-sm-6">
+                    <input id="writer" name="writer" type="text" class="form-control"
+                           placeholder="작성자" th:text="${writer}"/>
+                </div>
+            </div>
             <div class="col-sm-8 text-right">
                 <button type="submit" class="btn btn-primary">검색</button>
             </div>
