@@ -1,13 +1,18 @@
 package com.example.board;
 
+import com.example.board.dto.BoardSearch;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 게시물 컨트롤러
@@ -50,24 +55,35 @@ public class BoardController {
         return "boards/view";
     }
 
+//    /**
+//     * 게시물 목록 조회
+//     */
+//    @GetMapping("/boards")
+//    public String list(@RequestParam(required = false) String title,
+//                       @RequestParam(required = false) String writer,
+//                       Model model) {
+//        Board board = new Board();
+//        board.setTitle(title);
+//        board.setWriter(writer);
+//        Iterable<Board> boards = boardRepository.findAll(Example.of(board, matching()
+//                .withIgnoreNullValues()
+//                .withMatcher("title", matcher -> matcher.contains())
+//                .withMatcher("writer", matcher -> matcher.storeDefaultMatching())));
+//        model.addAttribute("boards", boards);
+//        model.addAttribute("title", title);
+//        model.addAttribute("writer", writer);
+//        return "boards/list";
+//    }
+
     /**
      * 게시물 목록 조회
      */
     @GetMapping("/boards")
-    public String list(@RequestParam(required = false) String title,
-                       @RequestParam(required = false) String writer,
+    public String list(BoardSearch search,
                        Model model) {
-        Iterable<Board> boards;
-        if (title != null) {    // 제목 검색
-            boards = boardRepository.findByTitleContaining(title);
-            model.addAttribute("title", title);
-        } else if (writer != null) {    // 작성자 검색
-            boards = boardRepository.findByWriter(writer);
-            model.addAttribute("writer", writer);
-        } else {
-            boards = boardRepository.findAll();
-        }
+        List<Board> boards = boardRepository.findAll(search.toSpec());
         model.addAttribute("boards", boards);
+        model.addAttribute("search", search);
         return "boards/list";
     }
 

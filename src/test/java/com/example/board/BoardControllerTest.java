@@ -1,5 +1,6 @@
 package com.example.board;
 
+import com.example.board.dto.BoardSearch;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import org.junit.Before;
@@ -251,7 +252,7 @@ public class BoardControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("boards/list"))
                 .andExpect(model().attribute("boards", Arrays.asList(board1)))
-                .andExpect(model().attribute("title", searchValue))
+                .andExpect(model().attribute("search", new BoardSearch(searchValue, null)))
                 .andExpect(model().hasNoErrors());
     }
 
@@ -272,9 +273,37 @@ public class BoardControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("boards/list"))
                 .andExpect(model().attribute("boards", Arrays.asList(board1)))
-                .andExpect(model().attribute("writer", searchValue))
+                .andExpect(model().attribute("search", new BoardSearch(null, searchValue)))
                 .andExpect(model().hasNoErrors());
     }
+
+//    @Test
+//    public void testSearch_TitleContainingAndWriterIs() throws Exception {
+//        // Given
+//        final int count = 10;
+//        final String searchValue = "searchSEARCH";  // 검색어
+//        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
+//        Board board1 = boards.get(0);   // 제목만 검색됨
+//        board1.setTitle(board1.getTitle() + searchValue + board1.getTitle());
+//        Board board2 = boards.get(1);   // 작성자만 검색됨
+//        board2.setWriter(searchValue);
+//        Board board3 = boards.get(2);   // 제목 & 작성자 검색됨
+//        board3.setTitle(board3.getTitle() + searchValue + board3.getTitle());
+//        board3.setWriter(searchValue);
+//        Iterable<Board> saveds = boardRepository.save(boards);
+//        // When
+//        mvc.perform(get("/boards")
+//                .contentType(MediaType.TEXT_HTML)
+//                .param("title", searchValue)
+//                .param("writer", searchValue))
+//                // Then
+//                .andExpect(status().isOk())
+//                .andExpect(view().name("boards/list"))
+//                .andExpect(model().attribute("boards", Arrays.asList(board3)))
+//                .andExpect(model().attribute("title", searchValue))
+//                .andExpect(model().attribute("writer", searchValue))
+//                .andExpect(model().hasNoErrors());
+//    }
 
     @Test
     public void testSearch_TitleContainingAndWriterIs() throws Exception {
@@ -284,7 +313,6 @@ public class BoardControllerTest {
         final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
         Board board1 = boards.get(0);   // 제목만 검색됨
         board1.setTitle(board1.getTitle() + searchValue + board1.getTitle());
-        board1.setWriter(searchValue);
         Board board2 = boards.get(1);   // 작성자만 검색됨
         board2.setWriter(searchValue);
         Board board3 = boards.get(2);   // 제목 & 작성자 검색됨
@@ -300,8 +328,7 @@ public class BoardControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("boards/list"))
                 .andExpect(model().attribute("boards", Arrays.asList(board3)))
-                .andExpect(model().attribute("title", searchValue))
-                .andExpect(model().attribute("writer", searchValue))
+                .andExpect(model().attribute("search", new BoardSearch(searchValue, searchValue)))
                 .andExpect(model().hasNoErrors());
     }
 }
