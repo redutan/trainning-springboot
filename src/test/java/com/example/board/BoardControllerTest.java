@@ -23,6 +23,7 @@ import java.util.Map;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static io.github.benas.randombeans.api.EnhancedRandom.randomListOf;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -330,5 +331,25 @@ public class BoardControllerTest {
                 .andExpect(model().attribute("boards", Arrays.asList(board3)))
                 .andExpect(model().attribute("search", new BoardSearch(searchValue, searchValue)))
                 .andExpect(model().hasNoErrors());
+    }
+
+    @Test
+    public void testPagingList_Page1() throws Exception {
+        // Given
+        final int pageSize = 10;
+        final int count = 25;
+        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
+        List<Board> saveds = boardRepository.save(boards);
+        List<Board> pages1 = saveds.stream().limit(pageSize).collect(toList()); // 1페이지 목록
+        // When
+        mvc.perform(get("/boards")
+                .contentType(MediaType.TEXT_HTML))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(view().name("boards/list"))
+                .andExpect(model().attributeExists("page"))
+                .andExpect(model().attribute("search", new BoardSearch(null, null)))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
     }
 }

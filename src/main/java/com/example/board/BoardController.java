@@ -1,8 +1,12 @@
 package com.example.board;
 
 import com.example.board.dto.BoardSearch;
+import com.example.web.PageWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -11,8 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.List;
 
 /**
  * 게시물 컨트롤러
@@ -80,9 +84,11 @@ public class BoardController {
      */
     @GetMapping("/boards")
     public String list(BoardSearch search,
-                       Model model) {
-        List<Board> boards = boardRepository.findAll(search.toSpec());
-        model.addAttribute("boards", boards);
+                       @PageableDefault Pageable pageable,
+                       Model model,
+                       HttpServletRequest request) {
+        Page<Board> page = boardRepository.findAll(search.toSpec(), pageable);
+        model.addAttribute("page", new PageWrapper<>(page, request));
         model.addAttribute("search", search);
         return "boards/list";
     }
