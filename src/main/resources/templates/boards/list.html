@@ -10,19 +10,19 @@
 <div class="container">
     <h2>게시물 검색</h2>
     <div class="container">
-        <form class="form-horizontal" th:action="@{/boards}" method="get">
+        <form class="form-horizontal" th:action="@{/boards}" th:object="${search}" method="get">
             <div class="form-group">
                 <label class="control-label col-sm-2" for="title">제목</label>
                 <div class="col-sm-6">
                     <input id="title" name="title" type="text" class="form-control"
-                           placeholder="제목" th:text="${title}"/>
+                           placeholder="제목" th:value="*{title}"/>
                 </div>
             </div>
             <div class="form-group">
                 <label class="control-label col-sm-2" for="writer">작성자</label>
                 <div class="col-sm-6">
                     <input id="writer" name="writer" type="text" class="form-control"
-                           placeholder="작성자" th:text="${writer}"/>
+                           placeholder="작성자" th:value="*{writer}"/>
                 </div>
             </div>
             <div class="col-sm-8 text-right">
