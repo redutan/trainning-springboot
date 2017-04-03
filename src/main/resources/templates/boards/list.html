@@ -55,12 +55,12 @@
         <div>
             <a th:href="@{/boards/form}" class="btn btn-default" role="button">등록</a>
         </div>
-        <nav class="text-center" th:unless="*{empty}">
+        <nav class="text-center" th:if="*{hasContent()}">
             <ul class="pagination">
-                <li th:class="*{hasPrevious}? '' : 'disabled'">
-                    <span th:if="*{not hasPrevious}" aria-label="true">&lt;</span>
-                    <a th:if="*{hasPrevious}" th:href="@{*{url}(page=*{number-1})}" aria-label="Previous">
-                        <span aria-label="true">&lt;</span>
+                <li th:class="*{hasPrevious()}? '' : 'disabled'">
+                    <span th:if="*{not hasPrevious()}" aria-hidden="true">&lt;</span>
+                    <a th:if="*{hasPrevious()}" th:href="@{*{url}(page=*{number-1})}" aria-label="Previous">
+                        <span>&lt;</span>
                     </a>
                 </li>
                 <li th:each="item : *{pageItems}" th:class="${item.current}? 'active' : ''">
@@ -68,10 +68,10 @@
                     <a th:if='${not item.current}' th:href='@{*{url}(page=${item.number})}'><span
                             th:text='${item.number + 1}'>1</span></a>
                 </li>
-                <li th:class="*{hasNext}? '' : 'disabled'">
-                    <span th:if='*{not hasNext}' aria-hidden="true">&gt;</span>
-                    <a th:if='*{hasNext}' th:href='@{*{url}(page=*{number+1})}' aria-label="Next">
-                        <span aria-hidden="true">&gt;</span>
+                <li th:class="*{hasNext()}? '' : 'disabled'">
+                    <span th:if='*{not hasNext()}' aria-hidden="true">&gt;</span>
+                    <a th:if='*{hasNext()}' th:href='@{*{url}(page=*{number+1})}' aria-label="Next">
+                        <span>&gt;</span>
                     </a>
                 </li>
             </ul>
