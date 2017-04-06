@@ -32,11 +32,11 @@ public class BoardSearch {
         return (root, query, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // 제목 contains 검색
-            if (!StringUtils.isEmpty(title)) {
+            if (StringUtils.hasText(title)) {
                 predicates.add(builder.like(root.get("title"), "%" + title + "%"));
             }
             // 작성자 equal 검색
-            if (!StringUtils.isEmpty(writer)) {
+            if (StringUtils.hasText(writer)) {
                 predicates.add(builder.equal(root.get("writer"), writer));
             }
             return builder.and(predicates.toArray(EMPTY_PREDICATES));

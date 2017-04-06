@@ -9,9 +9,12 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -23,6 +26,7 @@ import java.util.Map;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static io.github.benas.randombeans.api.EnhancedRandom.randomListOf;
+import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -258,6 +262,27 @@ public class BoardControllerTest {
     }
 
     @Test
+    public void testSearch_TitleIsEmpty() throws Exception {
+        // Given
+        final int count = 10;
+        final String searchValue = "searchSEARCH";  // 검색어
+        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
+        Board board1 = boards.get(0);   // 제목 검색됨
+        board1.setTitle(board1.getTitle() + searchValue + board1.getTitle());
+        Iterable<Board> saveds = boardRepository.save(boards);
+        // When
+        mvc.perform(get("/boards")
+                .contentType(MediaType.TEXT_HTML)
+                .param("title", ""))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(view().name("boards/list"))
+                .andExpect(model().attribute("boards", Arrays.asList(board1)))
+                .andExpect(model().attribute("search", new BoardSearch(searchValue, null)))
+                .andExpect(model().hasNoErrors());
+    }
+
+    @Test
     public void testSearch_WriterIs() throws Exception {
         // Given
         final int count = 10;
@@ -351,5 +376,86 @@ public class BoardControllerTest {
                 .andExpect(model().attribute("search", new BoardSearch(null, null)))
                 .andExpect(model().hasNoErrors())
                 .andReturn();
+    }
+
+    @Test
+    public void testSort_SortSeqDesc() throws Exception {
+        // Given
+        final int count = 25;
+        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
+        List<Board> saveds = boardRepository.save(boards);
+        Board lastBoard = saveds.get(count - 1);
+
+        // When
+        MvcResult mvcResult = mvc.perform(get("/boards")
+                .contentType(MediaType.TEXT_HTML))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(view().name("boards/list"))
+                .andExpect(model().attributeExists("page"))
+                .andExpect(model().attribute("search", new BoardSearch(null, null)))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+        @SuppressWarnings("unchecked")
+        Page<Board> page = (Page<Board>) mvcResult.getModelAndView().getModelMap().get("page");
+        Sort sort = page.getSort();
+        assertThat(sort.getOrderFor("seq"), is(new Sort.Order(Sort.Direction.DESC, "seq")));
+        assertThat(page.getContent().get(0), is(lastBoard));
+    }
+
+    @Test
+    public void testSort_SortWriterAsc() throws Exception {
+        // Given
+        final int count = 25;
+        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
+        List<Board> saveds = boardRepository.save(boards);
+        Board firstBoard = saveds.stream()
+                .sorted(comparing(Board::getWriter))
+                .findFirst().orElse(null);
+
+        // When
+        MvcResult mvcResult = mvc.perform(get("/boards")
+                .contentType(MediaType.TEXT_HTML)
+                .param("sort", "writer"))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(view().name("boards/list"))
+                .andExpect(model().attributeExists("page"))
+                .andExpect(model().attribute("search", new BoardSearch(null, null)))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+        @SuppressWarnings("unchecked")
+        Page<Board> page = (Page<Board>) mvcResult.getModelAndView().getModelMap().get("page");
+        Sort sort = page.getSort();
+        assertThat(sort.getOrderFor("writer"), is(new Sort.Order(Sort.Direction.ASC, "writer")));
+        assertThat(page.getContent().get(0), is(firstBoard));
+    }
+
+    @Test
+    public void testSort_SortWriterDesc() throws Exception {
+        // Given
+        final int count = 25;
+        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
+        List<Board> saveds = boardRepository.save(boards);
+        Board lastBoard = saveds.stream()
+                .sorted(comparing(Board::getWriter).reversed())
+                .findFirst().orElse(null);
+
+        // When
+        MvcResult mvcResult = mvc.perform(get("/boards")
+                .contentType(MediaType.TEXT_HTML)
+                .param("sort", "writer,desc"))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(view().name("boards/list"))
+                .andExpect(model().attributeExists("page"))
+                .andExpect(model().attribute("search", new BoardSearch(null, null)))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+        @SuppressWarnings("unchecked")
+        Page<Board> page = (Page<Board>) mvcResult.getModelAndView().getModelMap().get("page");
+        Sort sort = page.getSort();
+        assertThat(sort.getOrderFor("writer"), is(new Sort.Order(Sort.Direction.DESC, "writer")));
+        assertThat(page.getContent().get(0), is(lastBoard));
     }
 }

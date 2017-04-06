@@ -6,7 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -84,7 +86,7 @@ public class BoardController {
      */
     @GetMapping("/boards")
     public String list(BoardSearch search,
-                       @PageableDefault Pageable pageable,
+                       @PageableDefault @SortDefault(value = "seq", direction = Sort.Direction.DESC) Pageable pageable,
                        Model model,
                        HttpServletRequest request) {
         Page<Board> page = boardRepository.findAll(search.toSpec(), pageable);
