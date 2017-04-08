@@ -379,7 +379,7 @@ public class BoardControllerTest {
     }
 
     @Test
-    public void testSort_SortSeqDesc() throws Exception {
+    public void testSort_Default() throws Exception {
         // Given
         final int count = 25;
         final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
@@ -396,11 +396,16 @@ public class BoardControllerTest {
                 .andExpect(model().attribute("search", new BoardSearch(null, null)))
                 .andExpect(model().hasNoErrors())
                 .andReturn();
+        assertSortAndFistElement(mvcResult, "seq", Sort.Direction.DESC, lastBoard);
+    }
+
+    private void assertSortAndFistElement(MvcResult mvcResult, String property, Sort.Direction direction,
+                                          Board firstElement) {
         @SuppressWarnings("unchecked")
         Page<Board> page = (Page<Board>) mvcResult.getModelAndView().getModelMap().get("page");
         Sort sort = page.getSort();
-        assertThat(sort.getOrderFor("seq"), is(new Sort.Order(Sort.Direction.DESC, "seq")));
-        assertThat(page.getContent().get(0), is(lastBoard));
+        assertThat(sort.getOrderFor(property), is(new Sort.Order(direction, property)));
+        assertThat(page.getContent().get(0), is(firstElement));
     }
 
     @Test
@@ -424,11 +429,7 @@ public class BoardControllerTest {
                 .andExpect(model().attribute("search", new BoardSearch(null, null)))
                 .andExpect(model().hasNoErrors())
                 .andReturn();
-        @SuppressWarnings("unchecked")
-        Page<Board> page = (Page<Board>) mvcResult.getModelAndView().getModelMap().get("page");
-        Sort sort = page.getSort();
-        assertThat(sort.getOrderFor("writer"), is(new Sort.Order(Sort.Direction.ASC, "writer")));
-        assertThat(page.getContent().get(0), is(firstBoard));
+        assertSortAndFistElement(mvcResult, "writer", Sort.Direction.ASC, firstBoard);
     }
 
     @Test
@@ -452,10 +453,6 @@ public class BoardControllerTest {
                 .andExpect(model().attribute("search", new BoardSearch(null, null)))
                 .andExpect(model().hasNoErrors())
                 .andReturn();
-        @SuppressWarnings("unchecked")
-        Page<Board> page = (Page<Board>) mvcResult.getModelAndView().getModelMap().get("page");
-        Sort sort = page.getSort();
-        assertThat(sort.getOrderFor("writer"), is(new Sort.Order(Sort.Direction.DESC, "writer")));
-        assertThat(page.getContent().get(0), is(lastBoard));
+        assertSortAndFistElement(mvcResult, "writer", Sort.Direction.DESC, lastBoard);
     }
 }
