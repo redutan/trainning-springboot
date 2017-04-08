@@ -33,7 +33,7 @@ public class CommentController {
     }
 
     @GetMapping
-    public List<Comment> comments(@PathVariable(value = "boardSeq") Board board) {
+    public List<Comment> list(@PathVariable(value = "boardSeq") Board board) {
         return commentRepository.findByBoard(board);
     }
 }

@@ -89,7 +89,7 @@ public class CommentControllerTest {
     }
 
     @Test
-    public void testComments() throws Exception {
+    public void testList() throws Exception {
         // Given
         final int size = 11;
         mockingForComments(size);
