@@ -2,6 +2,7 @@ package com.example.board.comment;
 
 import com.example.board.Board;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -35,5 +36,12 @@ public class CommentController {
     @GetMapping
     public List<Comment> list(@PathVariable(value = "boardSeq") Board board) {
         return commentRepository.findByBoard(board);
+    }
+
+    @DeleteMapping("/{commentSeq}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable(value = "boardSeq") Board board,
+                       @PathVariable(value = "commentSeq") Comment comment) {
+        commentRepository.delete(comment);
     }
 }

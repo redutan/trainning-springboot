@@ -27,11 +27,8 @@ import static io.github.benas.randombeans.api.EnhancedRandom.randomListOf;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.internal.verification.VerificationModeFactory.only;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
@@ -74,7 +71,7 @@ public class CommentControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location",
                         is(endsWith(String.format("/boards/%s/comments/%s", board.getSeq(), saveComment.getSeq())))));
-        verify(commentRepository, only()).save(eq(comment));
+        verify(commentRepository, times(1)).save(eq(comment));
     }
 
     private void mockingForCreate() {
@@ -100,7 +97,7 @@ public class CommentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()", is(size)));
-        verify(commentRepository, only()).findByBoard(eq(board));
+        verify(commentRepository, times(1)).findByBoard(eq(board));
     }
 
     private void mockingForComments(int size) {
@@ -114,10 +111,33 @@ public class CommentControllerTest {
         });
     }
 
+    @Test
+    public void testDelete() throws Exception {
+        // Given
+        mockingForDelete();
+        // When
+        mockMvc.perform(delete("/boards/{boardSeq}/comments/{commentSeq}",
+                board.getSeq(), comment.getSeq())
+                .accept(MediaType.APPLICATION_JSON))
+                // Then
+                .andExpect(status().isNoContent());
+        verify(commentRepository, times(1)).findOne(eq(comment.getSeq()));
+        verify(commentRepository, times(1)).delete(eq(comment));
+    }
+
+    private void mockingForDelete() {
+        comment = random(Comment.class, "board");
+        comment.setBoard(board);
+
+        when(commentRepository.findOne(eq(comment.getSeq()))).thenReturn(comment);
+    }
+
     @TestConfiguration
     static class TestConfig {
         @Autowired
         private BoardRepository boardRepository;
+        @Autowired
+        private CommentRepository commentRepository;
 
         @Bean
         WebMvcConfigurer configurer() {
@@ -125,6 +145,7 @@ public class CommentControllerTest {
                 @Override
                 public void addFormatters(FormatterRegistry registry) {
                     registry.addConverter(String.class, Board.class, id -> boardRepository.findOne(Long.parseLong(id)));
+                    registry.addConverter(String.class, Comment.class, id -> commentRepository.findOne(Long.parseLong(id)));
                 }
             };
         }
