@@ -43,6 +43,92 @@
         <a th:href="@{/boards/{seq}/delete(seq=*{seq})}" class="btn btn-danger" role="button"
            onclick="return confirm('삭제하시겠습니까?');">삭제</a>
     </div>
+    <h2>댓글</h2>
+    <div id="comments" class="container">
+    </div>
 </div>
+<script src="https://fb.me/react-15.0.0.js"></script>
+<script src="https://fb.me/react-dom-15.0.0.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"
+        integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+<script type="text/babel" th:inline="javascript">
+/*<![CDATA[*/
+Date.prototype.dateFormat = function(format) {
+    var yyyy = this.getFullYear().toString();
+    format = format.replace(/yyyy/g, yyyy)
+    var mm = (this.getMonth()+1).toString();
+    format = format.replace(/mm/g, (mm[1]?mm:"0"+mm[0]));
+    var dd  = this.getDate().toString();
+    format = format.replace(/dd/g, (dd[1]?dd:"0"+dd[0]));
+    var hh = this.getHours().toString();
+    format = format.replace(/hh/g, (hh[1]?hh:"0"+hh[0]));
+    var ii = this.getMinutes().toString();
+    format = format.replace(/ii/g, (ii[1]?ii:"0"+ii[0]));
+    var ss  = this.getSeconds().toString();
+    format = format.replace(/ss/g, (ss[1]?ss:"0"+ss[0]));
+    return format;
+};
+
+var Comments = React.createClass({
+    loadComponentFromServer: function() {
+        $.ajax({
+            url: this.props.url
+            ,dataType: "json"
+            ,cache: false
+            ,success: function(data) {
+                console.log("success data");
+                console.log(data);
+                this.setState({data: data});
+            }.bind(this)
+            ,error: function(xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
+    },
+    getInitialState: function () {
+        return {data: []};
+    },
+    componentDidMount: function() {
+        console.log("Comments.componentDidMount");
+        this.loadComponentFromServer();
+    },
+    render: function() {
+        var commentNodes = this.state.data.map(function (comment) {
+            return (
+                <Comment comment={comment} key={comment.seq}/>
+            );
+        });
+        return (
+            <div>
+                {commentNodes}
+            </div>
+        );
+    }
+});
+var Comment = React.createClass({
+    dateFormat: function (timeMillis) {
+        var date = new Date(timeMillis);
+        return date.dateFormat('yyyy.mm.dd hh:ii:ss');
+    },
+    render: function () {
+        return (
+            <div className="panel panel-default">
+                <div className="panel-heading">
+                    {this.dateFormat(this.props.comment.regDate)} &nbsp; {this.props.comment.writer} &nbsp; <button className="btn btn-danger btn-xs">삭제</button>
+                </div>
+                <div className="panel-body">
+                    {this.props.comment.content}
+                </div>
+            </div>
+        );
+    }
+});
+ReactDOM.render(
+    <Comments url="/boards/[[${board.seq}]]/comments"/>,
+    document.getElementById("comments")
+);
+/*]]>*/
+</script>
 </body>
 </html>

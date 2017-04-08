@@ -2,6 +2,8 @@ package com.example;
 
 import com.example.board.Board;
 import com.example.board.BoardRepository;
+import com.example.board.comment.Comment;
+import com.example.board.comment.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.context.annotation.Configuration;
@@ -18,11 +20,17 @@ public class CreateSampleConfiguration {
 
     @Autowired
     private BoardRepository boardRepository;
+    @Autowired
+    private CommentRepository commentRepository;
 
     @PostConstruct
     public void preInitialize() {
         List<Board> boards = IntStream.rangeClosed(1, 25).mapToObj(this::newBoard).collect(toList());
-        boardRepository.save(boards);
+        List<Board> saveBoards = boardRepository.save(boards);
+        Board board = saveBoards.get(0);
+
+        List<Comment> comments = IntStream.rangeClosed(1, 5).mapToObj(i -> newComment(board, i)).collect(toList());
+        commentRepository.save(comments);
     }
 
     private Board newBoard(int i) {
@@ -31,5 +39,13 @@ public class CreateSampleConfiguration {
         board.setContent("내용입니다. " + i);
         board.setWriter("홍길동" + i);
         return board;
+    }
+
+    private Comment newComment(Board board, int i) {
+        Comment comment = new Comment();
+        comment.setBoard(board);
+        comment.setContent("댓글입니다." + i);
+        comment.setWriter("홍길동" + i);
+        return comment;
     }
 }
