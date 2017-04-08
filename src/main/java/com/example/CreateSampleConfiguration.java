@@ -14,14 +14,14 @@ import static java.util.stream.Collectors.toList;
 
 @Configuration
 @ConditionalOnMissingClass("com.example.SpringbootApplicationTests")
-public class SampleConfiguration {
+public class CreateSampleConfiguration {
 
     @Autowired
     private BoardRepository boardRepository;
 
     @PostConstruct
     public void preInitialize() {
-        List<Board> boards = IntStream.rangeClosed(1, 10).mapToObj(this::newBoard).collect(toList());
+        List<Board> boards = IntStream.rangeClosed(1, 25).mapToObj(this::newBoard).collect(toList());
         boardRepository.save(boards);
     }
 

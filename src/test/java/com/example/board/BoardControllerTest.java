@@ -1,5 +1,6 @@
 package com.example.board;
 
+import com.example.board.dto.BoardSearch;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import org.junit.Before;
@@ -8,19 +9,25 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.NestedServletException;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static io.github.benas.randombeans.api.EnhancedRandom.randomListOf;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -28,6 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -230,5 +238,221 @@ public class BoardControllerTest {
                 .andExpect(view().name("redirect:/boards"));
         Board updated = boardRepository.findOne(saved.getSeq());
         assertThat(updated, is(willUpdate));
+    }
+
+    @Test
+    public void testSearch_TitleContaining() throws Exception {
+        // Given
+        final int count = 10;
+        final String searchValue = "searchSEARCH";  // 검색어
+        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
+        Board board1 = boards.get(0);   // 제목 검색됨
+        board1.setTitle(board1.getTitle() + searchValue + board1.getTitle());
+        Iterable<Board> saveds = boardRepository.save(boards);
+        // When
+        mvc.perform(get("/boards")
+                .contentType(MediaType.TEXT_HTML)
+                .param("title", searchValue))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(view().name("boards/list"))
+                .andExpect(model().attribute("boards", Arrays.asList(board1)))
+                .andExpect(model().attribute("search", new BoardSearch(searchValue, null)))
+                .andExpect(model().hasNoErrors());
+    }
+
+    @Test
+    public void testSearch_TitleIsEmpty() throws Exception {
+        // Given
+        final int count = 10;
+        final String searchValue = "searchSEARCH";  // 검색어
+        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
+        Board board1 = boards.get(0);   // 제목 검색됨
+        board1.setTitle(board1.getTitle() + searchValue + board1.getTitle());
+        Iterable<Board> saveds = boardRepository.save(boards);
+        // When
+        mvc.perform(get("/boards")
+                .contentType(MediaType.TEXT_HTML)
+                .param("title", ""))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(view().name("boards/list"))
+                .andExpect(model().attribute("boards", Arrays.asList(board1)))
+                .andExpect(model().attribute("search", new BoardSearch(searchValue, null)))
+                .andExpect(model().hasNoErrors());
+    }
+
+    @Test
+    public void testSearch_WriterIs() throws Exception {
+        // Given
+        final int count = 10;
+        final String searchValue = "searchSEARCH";  // 검색어
+        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
+        Board board1 = boards.get(0);   // 작성자 검색됨
+        board1.setWriter(searchValue);
+        Iterable<Board> saveds = boardRepository.save(boards);
+        // When
+        mvc.perform(get("/boards")
+                .contentType(MediaType.TEXT_HTML)
+                .param("writer", searchValue))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(view().name("boards/list"))
+                .andExpect(model().attribute("boards", Arrays.asList(board1)))
+                .andExpect(model().attribute("search", new BoardSearch(null, searchValue)))
+                .andExpect(model().hasNoErrors());
+    }
+
+//    @Test
+//    public void testSearch_TitleContainingAndWriterIs() throws Exception {
+//        // Given
+//        final int count = 10;
+//        final String searchValue = "searchSEARCH";  // 검색어
+//        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
+//        Board board1 = boards.get(0);   // 제목만 검색됨
+//        board1.setTitle(board1.getTitle() + searchValue + board1.getTitle());
+//        Board board2 = boards.get(1);   // 작성자만 검색됨
+//        board2.setWriter(searchValue);
+//        Board board3 = boards.get(2);   // 제목 & 작성자 검색됨
+//        board3.setTitle(board3.getTitle() + searchValue + board3.getTitle());
+//        board3.setWriter(searchValue);
+//        Iterable<Board> saveds = boardRepository.save(boards);
+//        // When
+//        mvc.perform(get("/boards")
+//                .contentType(MediaType.TEXT_HTML)
+//                .param("title", searchValue)
+//                .param("writer", searchValue))
+//                // Then
+//                .andExpect(status().isOk())
+//                .andExpect(view().name("boards/list"))
+//                .andExpect(model().attribute("boards", Arrays.asList(board3)))
+//                .andExpect(model().attribute("title", searchValue))
+//                .andExpect(model().attribute("writer", searchValue))
+//                .andExpect(model().hasNoErrors());
+//    }
+
+    @Test
+    public void testSearch_TitleContainingAndWriterIs() throws Exception {
+        // Given
+        final int count = 10;
+        final String searchValue = "searchSEARCH";  // 검색어
+        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
+        Board board1 = boards.get(0);   // 제목만 검색됨
+        board1.setTitle(board1.getTitle() + searchValue + board1.getTitle());
+        Board board2 = boards.get(1);   // 작성자만 검색됨
+        board2.setWriter(searchValue);
+        Board board3 = boards.get(2);   // 제목 & 작성자 검색됨
+        board3.setTitle(board3.getTitle() + searchValue + board3.getTitle());
+        board3.setWriter(searchValue);
+        Iterable<Board> saveds = boardRepository.save(boards);
+        // When
+        mvc.perform(get("/boards")
+                .contentType(MediaType.TEXT_HTML)
+                .param("title", searchValue)
+                .param("writer", searchValue))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(view().name("boards/list"))
+                .andExpect(model().attribute("boards", Arrays.asList(board3)))
+                .andExpect(model().attribute("search", new BoardSearch(searchValue, searchValue)))
+                .andExpect(model().hasNoErrors());
+    }
+
+    @Test
+    public void testPagingList_Page1() throws Exception {
+        // Given
+        final int pageSize = 10;
+        final int count = 25;
+        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
+        List<Board> saveds = boardRepository.save(boards);
+        List<Board> pages1 = saveds.stream().limit(pageSize).collect(toList()); // 1페이지 목록
+        // When
+        mvc.perform(get("/boards")
+                .contentType(MediaType.TEXT_HTML))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(view().name("boards/list"))
+                .andExpect(model().attributeExists("page"))
+                .andExpect(model().attribute("search", new BoardSearch(null, null)))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+    }
+
+    @Test
+    public void testSort_Default() throws Exception {
+        // Given
+        final int count = 25;
+        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
+        List<Board> saveds = boardRepository.save(boards);
+        Board lastBoard = saveds.get(count - 1);
+
+        // When
+        MvcResult mvcResult = mvc.perform(get("/boards")
+                .contentType(MediaType.TEXT_HTML))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(view().name("boards/list"))
+                .andExpect(model().attributeExists("page"))
+                .andExpect(model().attribute("search", new BoardSearch(null, null)))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+        assertSortAndFistElement(mvcResult, "seq", Sort.Direction.DESC, lastBoard);
+    }
+
+    private void assertSortAndFistElement(MvcResult mvcResult, String property, Sort.Direction direction,
+                                          Board firstElement) {
+        @SuppressWarnings("unchecked")
+        Page<Board> page = (Page<Board>) mvcResult.getModelAndView().getModelMap().get("page");
+        Sort sort = page.getSort();
+        assertThat(sort.getOrderFor(property), is(new Sort.Order(direction, property)));
+        assertThat(page.getContent().get(0), is(firstElement));
+    }
+
+    @Test
+    public void testSort_SortWriterAsc() throws Exception {
+        // Given
+        final int count = 25;
+        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
+        List<Board> saveds = boardRepository.save(boards);
+        Board firstBoard = saveds.stream()
+                .sorted(comparing(Board::getWriter))
+                .findFirst().orElse(null);
+
+        // When
+        MvcResult mvcResult = mvc.perform(get("/boards")
+                .contentType(MediaType.TEXT_HTML)
+                .param("sort", "writer"))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(view().name("boards/list"))
+                .andExpect(model().attributeExists("page"))
+                .andExpect(model().attribute("search", new BoardSearch(null, null)))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+        assertSortAndFistElement(mvcResult, "writer", Sort.Direction.ASC, firstBoard);
+    }
+
+    @Test
+    public void testSort_SortWriterDesc() throws Exception {
+        // Given
+        final int count = 25;
+        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
+        List<Board> saveds = boardRepository.save(boards);
+        Board lastBoard = saveds.stream()
+                .sorted(comparing(Board::getWriter).reversed())
+                .findFirst().orElse(null);
+
+        // When
+        MvcResult mvcResult = mvc.perform(get("/boards")
+                .contentType(MediaType.TEXT_HTML)
+                .param("sort", "writer,desc"))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(view().name("boards/list"))
+                .andExpect(model().attributeExists("page"))
+                .andExpect(model().attribute("search", new BoardSearch(null, null)))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+        assertSortAndFistElement(mvcResult, "writer", Sort.Direction.DESC, lastBoard);
     }
 }

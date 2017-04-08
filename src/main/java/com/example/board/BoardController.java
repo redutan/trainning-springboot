@@ -1,7 +1,14 @@
 package com.example.board;
 
+import com.example.board.dto.BoardSearch;
+import com.example.web.PageWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -10,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 /**
@@ -53,13 +61,37 @@ public class BoardController {
         return "boards/view";
     }
 
+//    /**
+//     * 게시물 목록 조회
+//     */
+//    @GetMapping("/boards")
+//    public String list(@RequestParam(required = false) String title,
+//                       @RequestParam(required = false) String writer,
+//                       Model model) {
+//        Board board = new Board();
+//        board.setTitle(title);
+//        board.setWriter(writer);
+//        Iterable<Board> boards = boardRepository.findAll(Example.of(board, matching()
+//                .withIgnoreNullValues()
+//                .withMatcher("title", matcher -> matcher.contains())
+//                .withMatcher("writer", matcher -> matcher.storeDefaultMatching())));
+//        model.addAttribute("boards", boards);
+//        model.addAttribute("title", title);
+//        model.addAttribute("writer", writer);
+//        return "boards/list";
+//    }
+
     /**
      * 게시물 목록 조회
      */
     @GetMapping("/boards")
-    public String list(Model model) {
-        Iterable<Board> boards = boardRepository.findAll();
-        model.addAttribute("boards", boards);
+    public String list(BoardSearch search,
+                       @PageableDefault @SortDefault(value = "seq", direction = Sort.Direction.DESC) Pageable pageable,
+                       Model model,
+                       HttpServletRequest request) {
+        Page<Board> page = boardRepository.findAll(search.toSpec(), pageable);
+        model.addAttribute("page", new PageWrapper<>(page, request));
+        model.addAttribute("search", search);
         return "boards/list";
     }
 
