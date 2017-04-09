@@ -50,8 +50,7 @@
 <script src="https://fb.me/react-15.0.0.js"></script>
 <script src="https://fb.me/react-dom-15.0.0.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
-<script src="https://code.jquery.com/jquery-2.2.4.min.js"
-        integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 <script type="text/babel" th:inline="javascript">
 /*<![CDATA[*/
 Date.prototype.dateFormat = function(format) {
@@ -73,13 +72,30 @@ Date.prototype.dateFormat = function(format) {
 var Comments = React.createClass({
     loadComponentFromServer: function() {
         $.ajax({
-            url: this.props.url
+            url: "/boards/" + this.props.boardSeq + "/comments"
             ,dataType: "json"
             ,cache: false
             ,success: function(data) {
-                console.log("success data");
-                console.log(data);
                 this.setState({data: data});
+            }.bind(this)
+            ,error: function(xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
+    },
+    handleDeleteComment: function(comment) {
+        if (!confirm("삭제하시겠습니까?")) {
+            return;
+        }
+        $.ajax({
+            url: "/boards/" + this.props.boardSeq + "/comments" + "/" + comment.seq
+            ,type: "delete"
+            ,dataType: "json"
+            ,cache: false
+            ,success: function() {
+                var comments = this.state.data;
+                comments.splice(comments.indexOf(comment), 1);
+                this.setState({data: comments});
             }.bind(this)
             ,error: function(xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -90,18 +106,18 @@ var Comments = React.createClass({
         return {data: []};
     },
     componentDidMount: function() {
-        console.log("Comments.componentDidMount");
         this.loadComponentFromServer();
     },
     render: function() {
-        var commentNodes = this.state.data.map(function (comment) {
+        var handleDeleteComment = this.handleDeleteComment;
+        var comments = this.state.data.map(function (comment) {
             return (
-                <Comment comment={comment} key={comment.seq}/>
+                <Comment comment={comment} key={comment.seq} onDeleteComment={handleDeleteComment}/>
             );
         });
         return (
             <div>
-                {commentNodes}
+                {comments}
             </div>
         );
     }
@@ -111,11 +127,16 @@ var Comment = React.createClass({
         var date = new Date(timeMillis);
         return date.dateFormat('yyyy.mm.dd hh:ii:ss');
     },
+    handleDelete: function(e) {
+        e.preventDefault();
+        this.props.onDeleteComment(this.props.comment);
+    },
     render: function () {
         return (
             <div className="panel panel-default">
                 <div className="panel-heading">
-                    {this.dateFormat(this.props.comment.regDate)} &nbsp; {this.props.comment.writer} &nbsp; <button className="btn btn-danger btn-xs">삭제</button>
+                    {this.dateFormat(this.props.comment.regDate)} &nbsp; {this.props.comment.writer} &nbsp;
+                    <button className="btn btn-danger btn-xs" onClick={this.handleDelete}>x</button>
                 </div>
                 <div className="panel-body">
                     {this.props.comment.content}
@@ -125,7 +146,7 @@ var Comment = React.createClass({
     }
 });
 ReactDOM.render(
-    <Comments url="/boards/[[${board.seq}]]/comments"/>,
+    <Comments boardSeq="[[${board.seq}]]"/>,
     document.getElementById("comments")
 );
 /*]]>*/
