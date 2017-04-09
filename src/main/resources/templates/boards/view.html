@@ -75,8 +75,8 @@ var Comments = React.createClass({
             url: "/boards/" + this.props.boardSeq + "/comments"
             ,dataType: "json"
             ,cache: false
-            ,success: function(data) {
-                this.setState({data: data});
+            ,success: function(comments) {
+                this.setState({data: comments});
             }.bind(this)
             ,error: function(xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -102,6 +102,24 @@ var Comments = React.createClass({
             }.bind(this)
         });
     },
+    handleCreateComment: function(comment) {
+        $.ajax({
+            url: "/boards/" + this.props.boardSeq + "/comments"
+            ,type: "post"
+            ,dataType: "json"
+            ,contentType: "application/json"
+            ,data: JSON.stringify(comment)
+            ,cache: false
+            ,success: function(comment) {
+                var comments = this.state.data;
+                var newComments = comments.concat([comment]);
+                this.setState({data: newComments});
+            }.bind(this)
+            ,error: function(xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
+    },
     getInitialState: function () {
         return {data: []};
     },
@@ -116,8 +134,9 @@ var Comments = React.createClass({
             );
         });
         return (
-            <div>
+            <div className="container">
                 {comments}
+                <CommentForm onCreateComment={this.handleCreateComment}/>
             </div>
         );
     }
@@ -145,11 +164,65 @@ var Comment = React.createClass({
         );
     }
 });
+var CommentForm = React.createClass({
+    handleCreate: function(e) {
+        var getValueAndCheck = function(ref, msg) {
+            var element = ReactDOM.findDOMNode(ref);
+            var value = element.value.trim();
+            if (value === "") {
+                alert(msg);
+                element.focus();
+            }
+            return value;
+        };
+        var setEmptyValue = function(ref) {
+            ReactDOM.findDOMNode(ref).value = "";
+        };
+
+        e.preventDefault();
+        var writer = getValueAndCheck(this.refs.writer, "작성자를 입력해주세요.");
+        var content = getValueAndCheck(this.refs.content, "내용을 입력해주세요.");
+        this.props.onCreateComment({writer: writer, content: content});
+        setEmptyValue(this.refs.writer);
+        setEmptyValue(this.refs.content);
+        return;
+    },
+    render: function() {
+        return (
+            <form onSubmit={this.handleCreate}>
+                <div className="panel panel-info">
+                    <div className="panel-heading">
+                        <input type="text" name="writer" className="form-control" ref="writer" placeholder="작성자"/>
+                    </div>
+                    <div className="panel-body">
+                        <textarea className="form-control" name="content" ref="content" placeholder="댓글내용"></textarea>
+                        <div className="btn-group btn-group-sm pull-right" role="group">
+                            <button type="submit" className="btn btn-primary">등록</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        );
+    }
+});
 ReactDOM.render(
     <Comments boardSeq="[[${board.seq}]]"/>,
     document.getElementById("comments")
 );
 /*]]>*/
+
+
+
+
+
+
+
+
+
+
+
+
+
 </script>
 </body>
 </html>

@@ -70,7 +70,8 @@ public class CommentControllerTest {
                 // Then
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location",
-                        is(endsWith(String.format("/boards/%s/comments/%s", board.getSeq(), saveComment.getSeq())))));
+                        is(endsWith(String.format("/boards/%s/comments/%s", board.getSeq(), saveComment.getSeq())))))
+                .andExpect(content().json(objectMapper.writeValueAsString(saveComment)));
         verify(commentRepository, times(1)).save(eq(comment));
     }
 

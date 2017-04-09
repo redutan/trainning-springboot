@@ -5,6 +5,7 @@ import com.example.board.BoardRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -52,12 +53,13 @@ public class CommentControllerIntegrate2Test {
     public void testCreate() throws Exception {
         // Given
         // When
-        ResponseEntity<Object> responseEntity =
-                restTemplate.postForEntity("/boards/{boardSeq}/comments", comment, Object.class,
+        ResponseEntity<Comment> responseEntity =
+                restTemplate.postForEntity("/boards/{boardSeq}/comments", comment, Comment.class,
                         board.getSeq());
         // Then
         assertThat(responseEntity.getStatusCode(), is(HttpStatus.CREATED));
         assertThat(responseEntity.getHeaders().getLocation(), is(notNullValue()));
+        assertThat(responseEntity.getBody(), new ReflectionEquals(comment, "seq", "board", "regDate"));
     }
 
     @Test

@@ -24,7 +24,7 @@ public class CommentController {
         comment.setBoard(board);
         Comment save = commentRepository.save(comment);
         URI location = getLocation(board, save, uriComponentsBuilder);
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(save);
     }
 
     private URI getLocation(Board board, Comment comment, UriComponentsBuilder uriComponentsBuilder) {
