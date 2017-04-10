@@ -23,7 +23,7 @@ public class Board {
     /**
      * 제목
      */
-    @NotEmpty
+    @NotEmpty(message = "{com.example.board.NotEmpty.message}")
     @Column(nullable = false)
     private String title;
     /**
