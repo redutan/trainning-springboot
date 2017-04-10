@@ -110,11 +110,16 @@ var CommentForm = React.createClass({
 
         e.preventDefault();
         var writer = getValueAndCheck(this.refs.writer, "작성자를 입력해주세요.");
+        if (writer === "") {
+            return;
+        }
         var content = getValueAndCheck(this.refs.content, "내용을 입력해주세요.");
+        if (content === "") {
+            return;
+        }
         this.props.onCreateComment({writer: writer, content: content});
         setEmptyValue(this.refs.writer);
         setEmptyValue(this.refs.content);
-        return;
     },
     render: function() {
         return (
@@ -125,7 +130,8 @@ var CommentForm = React.createClass({
                     </div>
                     <div className="panel-body">
                         <textarea className="form-control" name="content" ref="content" placeholder="댓글내용"></textarea>
-                        <div className="btn-group btn-group-sm pull-right" role="group">
+                        <p/>
+                        <div className="btn-group pull-right">
                             <button type="submit" className="btn btn-primary">등록</button>
                         </div>
                     </div>
