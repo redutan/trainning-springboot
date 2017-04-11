@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<!--suppress HtmlUnknownAttribute -->
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>게시물 저장</title>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css}"/>
+</head>
+<body>
+<div class="container">
+    <p th:text="${exception.message}">
+        적절한 오류메세지가 노출됩니다.
+    </p>
+    <div class="btn-group">
+        <a th:href="@{/boards}" class="btn btn-primary" role="button">목록</a>
+        <a href="#" class="btn btn-default" role="button">뒤로가기</a>
+    </div>
+</div>
+</body>
+</html>

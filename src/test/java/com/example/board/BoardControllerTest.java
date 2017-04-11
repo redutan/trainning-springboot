@@ -231,4 +231,16 @@ public class BoardControllerTest {
         Board updated = boardRepository.findOne(saved.getSeq());
         assertThat(updated, is(willUpdate));
     }
+
+    @Test
+    public void testView_NotExistsBoard() throws Exception {
+        // Give
+        final int notExistSeq = Integer.MIN_VALUE;
+        // When
+        mvc.perform((get("/boards/{seq}", notExistSeq))
+                .contentType(MediaType.TEXT_HTML))
+                // Then
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("게시물이 존재하지 않습니다.")));
+    }
 }
