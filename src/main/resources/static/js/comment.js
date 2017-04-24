@@ -1,11 +1,11 @@
 var Comments = React.createClass({
     loadComponentFromServer: function() {
         $.ajax({
-            url: "/boards/" + this.props.boardSeq + "/comments"
+            url: "/api/boards/" + this.props.boardSeq + "/comments"
             ,dataType: "json"
             ,cache: false
-            ,success: function(comments) {
-                this.setState({data: comments});
+            ,success: function(json) {
+                this.setState({data: json._embedded.comments});
             }.bind(this)
             ,error: function(xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -17,7 +17,7 @@ var Comments = React.createClass({
             return;
         }
         $.ajax({
-            url: "/boards/" + this.props.boardSeq + "/comments" + "/" + comment.seq
+            url: "/api/comments/" + comment.seq
             ,type: "delete"
             ,dataType: "json"
             ,cache: false
@@ -32,8 +32,11 @@ var Comments = React.createClass({
         });
     },
     handleCreateComment: function(comment) {
+        comment.board = "http://localhost:8080/api/boards/" + this.props.boardSeq;
+        console.log("create comment");
+        console.log(JSON.stringify(comment));
         $.ajax({
-            url: "/boards/" + this.props.boardSeq + "/comments"
+            url: "/api/comments"
             ,type: "post"
             ,dataType: "json"
             ,contentType: "application/json"

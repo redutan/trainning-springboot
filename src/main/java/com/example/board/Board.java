@@ -1,18 +1,24 @@
 package com.example.board;
 
+import com.example.board.comment.Comment;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * 게시물 엔티티
  */
 @SuppressWarnings("WeakerAccess")
 @Data
+@EqualsAndHashCode(exclude = "comments")
+@ToString(exclude = "comments")
 @Entity
 public class Board {
     private static final Board EMPTY = new ImmutableBoard();
@@ -47,6 +53,11 @@ public class Board {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "REG_DATE", nullable = false, updatable = false)
     private Calendar regDate;
+    /**
+     * 댓글들
+     */
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "board")
+    private List<Comment> comments;
 
     static Board empty() {
         return EMPTY;
@@ -55,6 +66,10 @@ public class Board {
     @PrePersist
     void preInsert() {
         this.regDate = Calendar.getInstance();
+    }
+
+    public List<Comment> getComments() {
+        return comments;
     }
 
     private static class ImmutableBoard extends Board {

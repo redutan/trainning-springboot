@@ -1,7 +1,6 @@
 package com.example.board.comment;
 
 import com.example.board.Board;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -22,7 +21,6 @@ public class Comment {
     private Long seq;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "BOARD_SEQ", nullable = false)
-    @JsonIgnore
     private Board board;
     @Column(name = "CONTENT", nullable = false, length = 4000)
     private String content;

@@ -31,6 +31,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@SuppressWarnings("WeakerAccess")
 @RunWith(SpringRunner.class)
 @WebMvcTest(CommentController.class)
 public class CommentControllerTest {
@@ -98,18 +99,15 @@ public class CommentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()", is(size)));
-        verify(commentRepository, times(1)).findByBoard(eq(board));
+        verify(boardRepository, times(1)).findOne(eq(board.getSeq()));
     }
 
     private void mockingForComments(int size) {
-        comment = random(Comment.class, "seq", "board", "regDate");
-        when(commentRepository.findByBoard(eq(board))).then(invocation -> {
-            List<Comment> results = randomListOf(size, Comment.class, "board");
-            for (Comment each : results) {
-                each.setBoard(board);
-            }
-            return results;
-        });
+        List<Comment> comments = randomListOf(size, Comment.class, "board");
+        this.board.setComments(comments);
+        for (Comment each : comments) {
+            each.setBoard(this.board);
+        }
     }
 
     @Test

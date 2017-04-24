@@ -11,7 +11,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
-@RestController
+//@RestController
 @RequestMapping("/boards/{boardSeq}/comments")
 public class CommentController {
     @Autowired
@@ -35,7 +35,7 @@ public class CommentController {
 
     @GetMapping
     public List<Comment> list(@PathVariable(value = "boardSeq") Board board) {
-        return commentRepository.findByBoard(board);
+        return board.getComments();
     }
 
     @DeleteMapping("/{commentSeq}")
