@@ -1,11 +1,14 @@
 var Comments = React.createClass({
     loadComponentFromServer: function() {
+        console.log("loadComponentFromServer");
+        this.boardLink = location.origin + "/api/boards/" + this.props.boardSeq;
         $.ajax({
-            url: "/api/boards/" + this.props.boardSeq + "/comments"
+            url: this.boardLink + "/comments"
             ,dataType: "json"
             ,cache: false
             ,success: function(json) {
-                this.setState({data: json._embedded.comments});
+                console.log(json);
+                this.setState({commentResources: json});
             }.bind(this)
             ,error: function(xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -17,14 +20,16 @@ var Comments = React.createClass({
             return;
         }
         $.ajax({
-            url: "/api/comments/" + comment.seq
+            url: comment._links.self.href
             ,type: "delete"
             ,dataType: "json"
             ,cache: false
             ,success: function() {
-                var comments = this.state.data;
-                comments.splice(comments.indexOf(comment), 1);
-                this.setState({data: comments});
+                var newCommentResources = this.state.commentResources;
+                var newComments = newCommentResources._embedded.comments;
+                newComments.splice(newComments.indexOf(comment), 1);
+                newCommentResources._embedded.comments = newComments;
+                this.setState({commentResources: newCommentResources});
             }.bind(this)
             ,error: function(xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -32,9 +37,8 @@ var Comments = React.createClass({
         });
     },
     handleCreateComment: function(comment) {
-        comment.board = "http://localhost:8080/api/boards/" + this.props.boardSeq;
-        console.log("create comment");
-        console.log(JSON.stringify(comment));
+        console.log("handleCreateComment");
+        comment.board = this.boardLink;
         $.ajax({
             url: "/api/comments"
             ,type: "post"
@@ -42,10 +46,12 @@ var Comments = React.createClass({
             ,contentType: "application/json"
             ,data: JSON.stringify(comment)
             ,cache: false
-            ,success: function(comment) {
-                var comments = this.state.data;
-                var newComments = comments.concat([comment]);
-                this.setState({data: newComments});
+            ,success: function(json) {
+                var newCommentResources = this.state.commentResources;
+                var comments = newCommentResources._embedded.comments;
+                var newComments = comments.concat([json]);
+                newCommentResources._embedded.comments = newComments;
+                this.setState({commentResources: newCommentResources});
             }.bind(this)
             ,error: function(xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -53,18 +59,24 @@ var Comments = React.createClass({
         });
     },
     getInitialState: function () {
-        return {data: []};
+        return {commentResources: null};
     },
     componentDidMount: function() {
+        console.log("componentDidMount");
         this.loadComponentFromServer();
     },
     render: function() {
-        var handleDeleteComment = this.handleDeleteComment;
-        var comments = this.state.data.map(function (comment) {
-            return (
-                <Comment comment={comment} key={comment.seq} onDeleteComment={handleDeleteComment}/>
-            );
-        });
+        console.log("render");
+        console.log(this.state);
+        if (this.state.commentResources != null) {
+            var handleDeleteComment = this.handleDeleteComment;
+            var comments = this.state.commentResources._embedded.comments.map(function (comment) {
+                console.log(comment);
+                return (
+                    <Comment comment={comment} key={comment._links.self.href} onDeleteComment={handleDeleteComment}/>
+                );
+            });
+        }
         return (
             <div className="container">
                 {comments}
