@@ -4,10 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Value;
 import org.springframework.hateoas.Link;
 
-/**
- * @author redutan
- * @since 2017. 4. 24.
- */
 final class CommentDto {
     private CommentDto() {
         throw new UnsupportedOperationException();
