@@ -2,7 +2,6 @@ package com.example.board.comment;
 
 import com.example.board.Board;
 import com.example.board.BoardRepository;
-import com.example.board.dto.CommentDto;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
