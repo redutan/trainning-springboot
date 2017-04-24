@@ -29,9 +29,9 @@ import static org.junit.Assert.assertThat;
 public class CommentControllerIntegrate2Test {
     private static final ParameterizedTypeReference<Resource<Board>> BOARD_RESOURCE_TYPE = new ParameterizedTypeReference<Resource<Board>>() {
     };
-    private static final ParameterizedTypeReference<Resources<Comment>> COMMENT_RESOURCES_TYPE = new ParameterizedTypeReference<Resources<Comment>>() {
-    };
     private static final ParameterizedTypeReference<Resource<Comment>> COMMENT_RESOURCE_TYPE = new ParameterizedTypeReference<Resource<Comment>>() {
+    };
+    private static final ParameterizedTypeReference<Resources<Comment>> COMMENT_RESOURCES_TYPE = new ParameterizedTypeReference<Resources<Comment>>() {
     };
     @Autowired
     TestRestTemplate restTemplate;

@@ -9,6 +9,7 @@ import java.util.List;
  * 게시물 저장소
  */
 @SuppressWarnings("WeakerAccess")
+//@Repository
 public interface BoardRepository extends JpaRepository<Board, Long>, JpaSpecificationExecutor<Board> {
     List<Board> findByTitleContaining(String title);
 
