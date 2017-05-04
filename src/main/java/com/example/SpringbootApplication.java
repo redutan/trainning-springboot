@@ -24,10 +24,9 @@ public class SpringbootApplication {
                     .antMatchers("/").permitAll()   // "/"는 모두 접근 가능
                     .anyRequest().authenticated()  // 나머지(모든) 요청에 대해서 인증이 요구됨
                     .and()
-                    .formLogin()   // 폼 로그인 : "/login"
-                    .and()
-                    .logout()   // 기본 : "/logout"
+                    .formLogin()   // Default login uri : "/login"
             ;
+            // Default logout uri : "/logout"
         }
     }
 }
