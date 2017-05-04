@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>시작 페이지</title>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+</head>
+<body>
+<div class="container">
+    <div class="jumbotron">
+        <h1>시작 페이지</h1>
+        <p th:if="${#authorization.expression('isAuthenticated()')}">
+            <span th:text="${#authentication.name}"/>
+            님,
+            <a class="btn btn-default" th:href="@{/logout}">로그아웃</a>
+        </p>
+        <p>여기는 시작 페이지 입니다. 인증된 권한 별로 접근 가능한 링크가 아래에 표시됩니다.</p>
+        <p th:if="${#authorization.expression('!isAuthenticated()')}">
+            <a class="btn btn-default btn-lg" th:href="@{/login}">로그인</a>
+        </p>
+        <p th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+            <a class="btn btn-warning btn-lg" th:href="@{/admin}" role="button">관리자</a>
+        </p>
+        <p th:if="${#authorization.expression('hasRole(''USER'')')}">
+            <a class="btn btn-primary btn-lg" th:href="@{/boards}" role="button">게시물 목록</a>
+        </p>
+    </div>
+</div>
+</body>
+</html>

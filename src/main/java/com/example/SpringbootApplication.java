@@ -19,10 +19,15 @@ public class SpringbootApplication {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http
+                    .csrf().disable()       // CSRF를 비활성화 (나중에 자세히)
                     .authorizeRequests()
-                    .anyRequest().authenticated()
+                    .antMatchers("/").permitAll()   // "/"는 모두 접근 가능
+                    .anyRequest().authenticated()  // 나머지(모든) 요청에 대해서 인증이 요구됨
                     .and()
-                    .formLogin();
+                    .formLogin()   // 폼 로그인 : "/login"
+                    .and()
+                    .logout()   // 기본 : "/logout"
+            ;
         }
     }
 }

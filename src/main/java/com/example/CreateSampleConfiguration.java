@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClas
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -56,7 +57,9 @@ public class CreateSampleConfiguration {
     }
 
     private void createMembers() {
-        Member user = new Member("user", "user", "USER");
-        memberRepository.save(user);
+        List<Member> members = Arrays.asList(
+                new Member("user", "user", "USER"),
+                new Member("admin", "admin", "ADMIN"));
+        memberRepository.save(members);
     }
 }
