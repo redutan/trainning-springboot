@@ -44,7 +44,7 @@ public class MemberUserDetailsServiceTest {
     private void mockingMemberRepository() {
         member = random(Member.class, "memberId", "authority");
         member.setMemberId(username);
-        member.setAuthority("ROLE_USER");
+        member.setAuthority("USER");
         when(memberRepository.findOne(eq(username))).thenReturn(member);
     }
 

@@ -56,11 +56,7 @@ public class CreateSampleConfiguration {
     }
 
     private void createMembers() {
-        Member user = new Member();
-        user.setMemberId("user");
-        user.setPassword("user");
-        user.setAuthority("USER");
-
+        Member user = new Member("user", "user", "USER");
         memberRepository.save(user);
     }
 }
