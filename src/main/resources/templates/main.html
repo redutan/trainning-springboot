@@ -13,7 +13,7 @@
         <p th:if="${#authorization.expression('isAuthenticated()')}">
             <span th:text="${#authentication.name}"/>
             님,
-            <a class="btn btn-default" th:href="@{/logout}">로그아웃</a>
+            <button class="btn btn-default" onclick="logoutForm.submit();">로그아웃</button>
         </p>
         <p>여기는 시작 페이지 입니다. 인증된 권한 별로 접근 가능한 링크가 아래에 표시됩니다.</p>
         <p th:if="${#authorization.expression('!isAuthenticated()')}">
@@ -27,5 +27,7 @@
         </p>
     </div>
 </div>
+<form name="logoutForm" method="post" th:action="@{logout}">
+</form>
 </body>
 </html>

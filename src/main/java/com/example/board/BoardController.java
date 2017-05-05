@@ -46,6 +46,7 @@ public class BoardController {
      * 게시물 생성 처리
      */
     @PostMapping("/boards")
+    @PreAuthorize("#board.isCreate() or #board.writer == authentication.name")
     public String create(@Valid Board board, @AuthenticationPrincipal UserDetails user,
                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -113,6 +114,7 @@ public class BoardController {
      * 게시물 수정 폼
      */
     @GetMapping("/boards/{seq}/form")
+    @PreAuthorize("#board.writer == authentication.name")
     public String updateForm(@PathVariable("seq") Board board, Model model) {
         model.addAttribute("board", board);
         return "boards/form";

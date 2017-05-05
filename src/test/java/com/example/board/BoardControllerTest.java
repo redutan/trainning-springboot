@@ -34,6 +34,7 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -83,6 +84,7 @@ public class BoardControllerTest {
         MultiValueMap<String, String> params = toMultiValueMap(board);
         // When
         mvc.perform(post("/boards")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .params(params))
                 // Then
@@ -252,6 +254,7 @@ public class BoardControllerTest {
     @Test
     public void testUpdateForm() throws Exception {
         // Given
+        board.setWriter(USERNAME);
         final Board saved = boardRepository.save(board);
         // When
         mvc.perform(get("/boards/{seq}/form", saved.getSeq())
@@ -263,11 +266,47 @@ public class BoardControllerTest {
     }
 
     @Test
+    public void testUpdateForm_OtherUser() throws Exception {
+        // Given
+        final Board saved = boardRepository.save(board);
+        // When
+        mvc.perform(get("/boards/{seq}/form", saved.getSeq())
+                .with(csrf())
+                .contentType(MediaType.TEXT_HTML))
+                // Then
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     public void testUpdate() throws Exception {
+        // Given
+        board.setWriter(USERNAME);
+        final Board saved = boardRepository.save(board);
+        final Board willUpdate = random(Board.class);
+        willUpdate.setSeq(saved.getSeq());
+        willUpdate.setWriter(saved.getWriter());
+        willUpdate.setRegDate(null);
+        willUpdate.setComments(null);
+        MultiValueMap<String, String> params = toMultiValueMap(willUpdate);
+        // When
+        mvc.perform(post("/boards")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .params(params))
+                // Then
+                .andExpect(status().isFound())   // 302
+                .andExpect(view().name("redirect:/boards"));
+        Board updated = boardRepository.findOne(saved.getSeq());
+        assertThat(updated, is(willUpdate));
+    }
+
+    @Test
+    public void testUpdate_OtherUser() throws Exception {
         // Given
         final Board saved = boardRepository.save(board);
         final Board willUpdate = random(Board.class);
         willUpdate.setSeq(saved.getSeq());
+        willUpdate.setWriter(saved.getWriter());
         willUpdate.setRegDate(null);
         willUpdate.setComments(null);
         MultiValueMap<String, String> params = toMultiValueMap(willUpdate);
@@ -276,10 +315,9 @@ public class BoardControllerTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .params(params))
                 // Then
-                .andExpect(status().isFound())   // 302
-                .andExpect(view().name("redirect:/boards"));
+                .andExpect(status().isForbidden());   // 302
         Board updated = boardRepository.findOne(saved.getSeq());
-        assertThat(updated, is(willUpdate));
+        assertThat(updated, is(saved));
     }
 
     @Test

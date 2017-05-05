@@ -64,6 +64,11 @@ public class Board {
         return result;
     }
 
+    public boolean isCreate() {
+        //noinspection ConstantConditions
+        return seq == null;
+    }
+
     @PrePersist
     void preInsert() {
         this.regDate = Calendar.getInstance();
