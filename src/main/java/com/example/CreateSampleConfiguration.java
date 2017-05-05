@@ -36,8 +36,6 @@ public class CreateSampleConfiguration {
 
         List<Comment> comments = IntStream.rangeClosed(1, 5).mapToObj(i -> newComment(board, i)).collect(toList());
         commentRepository.save(comments);
-
-        createMembers();
     }
 
     private Board newBoard(int i) {
@@ -56,7 +54,8 @@ public class CreateSampleConfiguration {
         return comment;
     }
 
-    private void createMembers() {
+    @PostConstruct
+    public void createMembers() {
         List<Member> members = Arrays.asList(
                 new Member("user", "user", "USER"),
                 new Member("admin", "admin", "ADMIN"));

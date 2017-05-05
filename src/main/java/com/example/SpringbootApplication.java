@@ -21,8 +21,8 @@ public class SpringbootApplication {
             http
                     .csrf().disable()       // CSRF를 비활성화 (나중에 자세히)
                     .authorizeRequests()
-                    .antMatchers("/admin").hasRole("ADMIN")
-                    .antMatchers("/boards", "/boards/**").hasRole("USER")
+                    .antMatchers("/admin").hasRole("ADMIN") // 해당 uri에 ADMIN 권한이 있어야 접근 가능
+                    .antMatchers("/boards", "/boards/**").hasRole("USER")   // 해당 uri들에 USER 권한이 있어야 접근 가능
                     .antMatchers("/").permitAll()   // "/"는 모두 접근 가능
                     .anyRequest().authenticated()  // 나머지(모든) 요청에 대해서 인증이 요구됨
                     .and()
