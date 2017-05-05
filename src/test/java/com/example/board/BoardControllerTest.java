@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -25,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.board.BoardControllerTest.USERNAME;
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static io.github.benas.randombeans.api.EnhancedRandom.randomListOf;
 import static java.util.Comparator.comparing;
@@ -42,8 +44,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @Slf4j
-@WithMockUser(roles = "USER")
+@WithMockUser(username = USERNAME, roles = "USER")
 public class BoardControllerTest {
+    public static final String USERNAME = "user1";
     @Autowired
     private MockMvc mvc;
     @Autowired
@@ -84,6 +87,9 @@ public class BoardControllerTest {
                 // Then
                 .andExpect(status().isFound())   // 302
                 .andExpect(view().name("redirect:/boards"));
+        Board createBoard = getLastCreateBoard();
+        board.setWriter(USERNAME);
+        assertBoard(createBoard, board);
     }
 
     private MultiValueMap<String, String> toMultiValueMap(Object obj) throws Exception {
@@ -91,6 +97,17 @@ public class BoardControllerTest {
         LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.setAll(objMap);
         return params;
+    }
+
+    private Board getLastCreateBoard() {
+        Page<Board> page = boardRepository.findAll(new PageRequest(0, 1, Sort.Direction.DESC, "seq"));
+        return page.getContent().get(0);
+    }
+
+    private void assertBoard(Board expected, Board actual) {
+        assertThat(expected.getTitle(), is(actual.getTitle()));
+        assertThat(expected.getContent(), is(actual.getContent()));
+        assertThat(expected.getWriter(), is(actual.getWriter()));
     }
 
     @Test

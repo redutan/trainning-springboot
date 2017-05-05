@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -43,12 +45,13 @@ public class BoardController {
      * 게시물 생성 처리
      */
     @PostMapping("/boards")
-    public String create(@Valid Board board, BindingResult bindingResult) {
+    public String create(@Valid Board board, @AuthenticationPrincipal UserDetails user,
+                         BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "boards/form";
         }
-        Board save = boardRepository.save(board);
-        log.info("save = {}", save);
+        board.setWriter(user.getUsername());
+        boardRepository.save(board);
         return "redirect:/boards";
     }
 
