@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -36,8 +37,8 @@ public class BoardController {
      * 게시물 생성 폼
      */
     @GetMapping("/boards/form")
-    public String createForm(Model model) {
-        model.addAttribute("board", new Board());
+    public String createForm(Model model, @AuthenticationPrincipal UserDetails user) {
+        model.addAttribute("board", Board.withWriter(user.getUsername()));
         return "boards/form";
     }
 
@@ -102,8 +103,9 @@ public class BoardController {
      * 게시물 1건 삭제
      */
     @RequestMapping("/boards/{seq}/delete")
-    public String delete(@PathVariable("seq") Long seq) {
-        boardRepository.delete(seq);
+    @PreAuthorize("#board.writer == authentication.name")
+    public String delete(@PathVariable("seq") Board board) {
+        boardRepository.delete(board);
         return "redirect:/boards";
     }
 

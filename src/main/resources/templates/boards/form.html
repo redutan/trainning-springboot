@@ -21,7 +21,8 @@
         </div>
         <div th:classappend="${#fields.hasErrors('writer')} ? 'has-error' : ''" class="form-group has-feedback">
             <label for="writer">작성자</label>
-            <input th:field="*{writer}" type="text" class="form-control" placeholder="작성자"/>
+            <input th:field="*{writer}" type="text" class="form-control"
+                   placeholder="작성자" readonly="readonly"/>
             <label th:if="${#fields.hasErrors('writer')}" th:errors="*{writer}" class="control-label"
                    for="title"></label>
             <span th:if="${#fields.hasErrors('writer')}" class="glyphicon glyphicon-remove form-control-feedback"

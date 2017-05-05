@@ -73,7 +73,8 @@ public class BoardControllerTest {
                 // Then
                 .andExpect(status().isOk())   // 200
                 .andExpect(view().name("boards/form"))
-                .andExpect(content().string(containsString("게시물 저장")));
+                .andExpect(content().string(containsString("게시물 저장")))
+                .andExpect(content().string(containsString(USERNAME)));
     }
 
     @Test
@@ -218,7 +219,10 @@ public class BoardControllerTest {
     public void testDelete() throws Exception {
         // Given
         final int count = 2;
-        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
+        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate", "writer");
+        for (Board each : boards) {
+            each.setWriter(USERNAME);
+        }
         Iterable<Board> saveds = boardRepository.save(boards);
         final Board first = saveds.iterator().next();
         // When
@@ -229,6 +233,20 @@ public class BoardControllerTest {
                 .andExpect(view().name("redirect:/boards"));
         assertThat(boardRepository.exists(first.getSeq()), is(false));  // 삭제되었는가?
         assertThat(boardRepository.count(), is(count - 1L)); // 하나만 삭제되었는가?
+    }
+
+    @Test
+    public void testDelete_OtherUser() throws Exception {
+        // Given
+        final int count = 2;
+        final List<Board> boards = randomListOf(count, Board.class, "seq", "regDate");
+        Iterable<Board> saveds = boardRepository.save(boards);
+        final Board first = saveds.iterator().next();
+        // When
+        mvc.perform(get("/boards/{seq}/delete", first.getSeq())
+                .contentType(MediaType.TEXT_HTML))
+                // Then
+                .andExpect(status().isForbidden());  // 403
     }
 
     @Test

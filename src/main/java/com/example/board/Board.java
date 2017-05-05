@@ -21,7 +21,6 @@ import java.util.List;
 @ToString(exclude = "comments")
 @Entity
 public class Board {
-    private static final Board EMPTY = new ImmutableBoard();
     /**
      * 순번
      */
@@ -59,8 +58,10 @@ public class Board {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "board")
     private List<Comment> comments;
 
-    static Board empty() {
-        return EMPTY;
+    public static Board withWriter(String writer) {
+        Board result = new Board();
+        result.setWriter(writer);
+        return result;
     }
 
     @PrePersist
@@ -70,32 +71,5 @@ public class Board {
 
     public List<Comment> getComments() {
         return comments;
-    }
-
-    private static class ImmutableBoard extends Board {
-        @Override
-        public void setSeq(Long seq) {
-            throw new UnsupportedOperationException("Immutable");
-        }
-
-        @Override
-        public void setTitle(String title) {
-            throw new UnsupportedOperationException("Immutable");
-        }
-
-        @Override
-        public void setContent(String content) {
-            throw new UnsupportedOperationException("Immutable");
-        }
-
-        @Override
-        public void setWriter(String writer) {
-            throw new UnsupportedOperationException("Immutable");
-        }
-
-        @Override
-        public void setRegDate(Calendar regDate) {
-            throw new UnsupportedOperationException("Immutable");
-        }
     }
 }
