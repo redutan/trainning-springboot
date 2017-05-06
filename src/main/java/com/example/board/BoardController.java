@@ -38,7 +38,7 @@ public class BoardController {
      */
     @GetMapping("/boards/form")
     public String createForm(Model model, @AuthenticationPrincipal UserDetails user) {
-        model.addAttribute("board", Board.withWriter(user.getUsername()));
+        model.addAttribute("board", Board.builder().writer(user.getUsername()).build());
         return "boards/form";
     }
 
