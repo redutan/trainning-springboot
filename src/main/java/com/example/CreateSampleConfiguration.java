@@ -9,6 +9,7 @@ import com.example.member.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
@@ -27,6 +28,8 @@ public class CreateSampleConfiguration {
     private CommentRepository commentRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostConstruct
     public void preInitialize() {
@@ -57,8 +60,8 @@ public class CreateSampleConfiguration {
     @PostConstruct
     public void createMembers() {
         List<Member> members = Arrays.asList(
-                new Member("user", "user", "USER"),
-                new Member("admin", "admin", "ADMIN"));
+                new Member("user", passwordEncoder.encode("user"), "USER"),
+                new Member("admin", passwordEncoder.encode("admin"), "ADMIN"));
         memberRepository.save(members);
     }
 }
