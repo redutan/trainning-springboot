@@ -1,7 +1,10 @@
 package com.example.board;
 
 import com.example.board.comment.Comment;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -18,7 +21,6 @@ import java.util.List;
 @EqualsAndHashCode(exclude = "comments")
 @ToString(exclude = "comments")
 @NoArgsConstructor
-@Builder
 @Entity
 public class Board {
     /**
@@ -58,11 +60,11 @@ public class Board {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "board")
     private List<Comment> comments;
 
-//    public static Board withWriter(String writer) {
-//        Board result = new Board();
-//        result.setWriter(writer);
-//        return result;
-//    }
+    public static Board withWriter(String writer) {
+        Board result = new Board();
+        result.setWriter(writer);
+        return result;
+    }
 
     public boolean isCreate() {
         //noinspection ConstantConditions
@@ -72,9 +74,5 @@ public class Board {
     @PrePersist
     void preInsert() {
         this.regDate = Calendar.getInstance();
-    }
-
-    public List<Comment> getComments() {
-        return comments;
     }
 }
