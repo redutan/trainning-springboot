@@ -1,6 +1,7 @@
 package com.example.board;
 
 import com.example.board.comment.Comment;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -66,6 +67,7 @@ public class Board {
         return result;
     }
 
+    @JsonIgnore
     public boolean isCreate() {
         //noinspection ConstantConditions
         return seq == null;

@@ -13,7 +13,9 @@ import java.util.List;
 
 //@RestController
 @RequestMapping("/boards/{boardSeq}/comments")
+@Deprecated
 public class CommentController {
+    @SuppressWarnings({"SpringAutowiredFieldsWarningInspection", "SpringJavaAutowiredMembersInspection"})
     @Autowired
     private CommentRepository commentRepository;
 
